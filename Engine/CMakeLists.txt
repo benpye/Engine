@@ -13,7 +13,7 @@ source_group(Source\\Platform REGULAR_EXPRESSION Platform/.*)
 source_group(Source REGULAR_EXPRESSION Main.cpp)
 
 target_include_directories(Engine PUBLIC
-	${EXT_LIBS}/glew/include
+	${EXT_LIBS}/glew/glew/include
 	${EXT_LIBS}/SDL2/include
 	${OPENGL_INCLUDE_DIRS}
 )
