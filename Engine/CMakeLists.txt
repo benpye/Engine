@@ -7,9 +7,13 @@ add_executable(Engine
 	Platform/SDLApplication.cpp
 	Platform/SDLApplication.h
 	Platform/IApplication.h
+	Filesystem/IFilesystem.h
+	Filesystem/StdFilesystem.cpp
+	Filesystem/StdFilesystem.h
 )
 
 source_group(Source\\Platform REGULAR_EXPRESSION Platform/.*)
+source_group(Source\\Filesystem REGULAR_EXPRESSION Filesystem/.*)
 source_group(Source REGULAR_EXPRESSION Main.cpp)
 
 target_include_directories(Engine PUBLIC

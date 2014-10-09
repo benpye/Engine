@@ -1,6 +1,9 @@
 #include "Platform/IApplication.h"
 #include "Platform/SDLApplication.h"
 
+#include "Filesystem/IFilesystem.h"
+#include "Filesystem/StdFilesystem.h"
+
 #include <GL/glew.h>
 
 int main(int argc, char **argv)
@@ -13,6 +16,14 @@ int main(int argc, char **argv)
 	config.WindowTitle = "Hello World!";
 
 	IApplication *app = new SDLApplication(&config);
+
+	IFilesystem *fs = new StdFilesystem();
+
+	FileHandle test = fs->Open("SDL2.dll");
+	bool isValid = false;
+	isValid = fs->IsValid(test);
+	fs->Close(test);
+	isValid = fs->IsValid(test);
 
 	glewExperimental = true;
 	glewInit();
