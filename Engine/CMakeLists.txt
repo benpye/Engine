@@ -8,8 +8,11 @@ add_executable(Engine
 	Platform/SDLApplication.h
 	Platform/IApplication.h
 	Filesystem/IFilesystem.h
-	Filesystem/StdFilesystem.cpp
-	Filesystem/StdFilesystem.h
+	Filesystem/Filesystem.cpp
+	Filesystem/Filesystem.h
+	Filesystem/StdioSearchPath.cpp
+	Filesystem/StdioSearchPath.h
+	Filesystem/ISearchPath.h
 )
 
 source_group(Source\\Platform REGULAR_EXPRESSION Platform/.*)

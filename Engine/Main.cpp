@@ -2,7 +2,7 @@
 #include "Platform/SDLApplication.h"
 
 #include "Filesystem/IFilesystem.h"
-#include "Filesystem/StdFilesystem.h"
+#include "Filesystem/Filesystem.h"
 
 #include <GL/glew.h>
 
@@ -17,13 +17,13 @@ int main(int argc, char **argv)
 
 	IApplication *app = new SDLApplication(&config);
 
-	IFilesystem *fs = new StdFilesystem();
-
-	FileHandle test = fs->Open("SDL2.dll");
-	bool isValid = false;
-	isValid = fs->IsValid(test);
-	fs->Close(test);
-	isValid = fs->IsValid(test);
+	IFilesystem *fs = new Filesystem();
+	fs->SetWritePath(Filesystem::GetApplicationDirectory());
+	bool exists = false;
+	exists = fs->Exists("SDL2.dll");
+	FileHandle f = fs->Open("test.txt", FileOpenWrite);
+	unsigned int sz = fs->Size(f);
+	fs->Close(f);
 
 	glewExperimental = true;
 	glewInit();

@@ -7,22 +7,29 @@ using namespace std;
 
 typedef void* FileHandle;
 
-enum FileOptions
+enum FileOpen
 {
-	None = 0,
-	Write = 1
+	FileOpenNone = 0,
+	FileOpenWrite = 1
+};
+
+enum FileSeek
+{
+	FileSeekHead = SEEK_SET,
+	FileSeekCurrent = SEEK_CUR,
+	FileSeekTail = SEEK_END
 };
 
 class IFilesystem
 {
 public:
-	virtual FileHandle Open(string name, FileOptions options = None) = 0;
+	virtual FileHandle Open(string name, FileOpen options = FileOpenNone) = 0;
 	virtual void Close(FileHandle file) = 0;
+	virtual unsigned int Size(FileHandle file) = 0;
+	virtual void Seek(FileHandle file, int pos, FileSeek origin) = 0;
+	virtual unsigned int Tell(FileHandle file) = 0;
 
-	// This is to be used to check if open was successful, not if a file handle
-	// has been closed. This may return true even if the handle is invalid if
-	// close has been called.
-	virtual bool IsValid(FileHandle file) = 0;
+	virtual bool Exists(string name) = 0;
 	
 	virtual void SetWritePath(string path) = 0;
 	virtual vector<string> GetSearchPath() = 0;
