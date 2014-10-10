@@ -82,8 +82,24 @@ unsigned int Filesystem::Tell(FileHandle handle)
 	return f->searchPath->Tell(f->fileHandle);
 }
 
+unsigned int Filesystem::Read(FileHandle handle, void *buf, unsigned int size)
+{
+	FSHandle *f = static_cast<FSHandle *>(handle);
+	return f->searchPath->Read(f->fileHandle, buf, size);
+}
+
+unsigned int Filesystem::Write(FileHandle handle, const void *buf, unsigned int size)
+{
+	FSHandle *f = static_cast<FSHandle *>(handle);
+	return f->searchPath->Write(f->fileHandle, buf, size);
+}
+
 bool Filesystem::Exists(string name)
 {
+	if (writePath != nullptr)
+		if (writePath->Exists(name))
+			return true;
+
 	for (auto path : searchPath)
 	{
 		if (path.second->Exists(name))
@@ -93,11 +109,39 @@ bool Filesystem::Exists(string name)
 	return false;
 }
 
+vector<string> Filesystem::ListDirectory(string path)
+{
+	vector<string> ls;
+
+	if (writePath != nullptr)
+		ls = writePath->ListDirectory(path);
+
+	for (auto sp : searchPath)
+	{
+		vector<string> t = sp.second->ListDirectory(path);
+		if (t.size() == 0) continue;
+		
+		// Join the vectors
+		vector<string> n;
+		n.reserve(t.size() + ls.size());
+		n.insert(n.end(), ls.begin(), ls.end());
+		n.insert(n.end(), t.begin(), t.end());
+		ls = n;
+	}
+
+	// Sort then remove any duplicate entries
+	sort(ls.begin(), ls.end());
+	ls.erase(unique(ls.begin(), ls.end()), ls.end());
+
+	return ls;
+}
+
 void Filesystem::SetWritePath(string path)
 {
 	// Write path is always stdio
 	if (writePath != nullptr)
 		delete writePath;
+
 	writePath = new StdioSearchPath(path);
 }
 

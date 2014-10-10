@@ -22,8 +22,12 @@ int main(int argc, char **argv)
 	bool exists = false;
 	exists = fs->Exists("SDL2.dll");
 	FileHandle f = fs->Open("test.txt", FileOpenWrite);
+	char *test = "Hello world!\n";
+	fs->Write(f, test, strlen(test));
 	unsigned int sz = fs->Size(f);
 	fs->Close(f);
+
+	vector<string> testlist = fs->ListDirectory("../../");
 
 	glewExperimental = true;
 	glewInit();
