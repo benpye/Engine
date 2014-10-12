@@ -14,7 +14,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
 	"Single Directory for all Executables."
 )
 
-set(EXT_LIBS PATH ${CMAKE_SOURCE_DIR}/ThirdParty)
+set(EXT_LIBS ${CMAKE_SOURCE_DIR}/ThirdParty)
+set(PUBLIC_INCLUDE ${CMAKE_SOURCE_DIR}/Public)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 

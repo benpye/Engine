@@ -8,12 +8,16 @@
 #include <windows.h>
 #endif
 
-StdioSearchPath::StdioSearchPath(string path)
+// We use cstdio as we provide a more C like api to the filesystem
+// This maps easier to the cstdio functions than to iostreams
+// It is also supported more widely (emscripten)
+
+StdioSearchPath::StdioSearchPath(const string &path)
 {
 	base = path;
 }
 
-bool StdioSearchPath::Exists(string name)
+bool StdioSearchPath::Exists(const string &name)
 {
 	FILE *f = nullptr;
 	f = fopen(ConstructPath(name).c_str(), "rb");
@@ -26,7 +30,7 @@ bool StdioSearchPath::Exists(string name)
 	return false;
 }
 
-IntFileHandle StdioSearchPath::Open(string name, FileOpen options)
+IntFileHandle StdioSearchPath::Open(const string &name, FileOpen options)
 {
 	FILE *f = nullptr;
 	f = fopen(ConstructPath(name).c_str(), (options & FileOpenWrite) ? "wb" : "rb");
@@ -80,11 +84,11 @@ unsigned int StdioSearchPath::Write(IntFileHandle handle, const void *buf, unsig
 	return 0;
 }
 
-vector<string> StdioSearchPath::ListDirectory(string path)
+vector<string> StdioSearchPath::FileFind(const string &wildcard)
 {
 	vector<string> ls;
 #ifdef WIN32
-	string filter = ConstructPath(path) + "/*.*";
+	string filter = ConstructPath(wildcard);
 	WIN32_FIND_DATA findData;
 	HANDLE findHandle = nullptr;
 
@@ -94,7 +98,10 @@ vector<string> StdioSearchPath::ListDirectory(string path)
 		{
 			if (strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0)
 			{
-				ls.push_back(findData.cFileName);
+				if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+					ls.push_back(string(findData.cFileName) + "/");
+				else
+					ls.push_back(findData.cFileName);
 			}
 		} while (FindNextFile(findHandle, &findData));
 
@@ -106,7 +113,7 @@ vector<string> StdioSearchPath::ListDirectory(string path)
 	return ls;
 }
 
-string StdioSearchPath::ConstructPath(string name)
+string StdioSearchPath::ConstructPath(const string &name)
 {
 	return base + "/" + name;
 }

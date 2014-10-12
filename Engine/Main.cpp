@@ -15,19 +15,20 @@ int main(int argc, char **argv)
 	config.Height      = 600;
 	config.WindowTitle = "Hello World!";
 
-	IApplication *app = new SDLApplication(&config);
+	IApplication *app = new SDLApplication(config);
 
 	IFilesystem *fs = new Filesystem();
 	fs->SetWritePath(Filesystem::GetApplicationDirectory());
+	fs->AddSearchPath(Filesystem::GetApplicationDirectory() + "/Test.zip");
 	bool exists = false;
-	exists = fs->Exists("SDL2.dll");
+	exists = fs->Exists("glew-1.11.0/src/glew.c");
 	FileHandle f = fs->Open("test.txt", FileOpenWrite);
 	char *test = "Hello world!\n";
 	fs->Write(f, test, strlen(test));
 	unsigned int sz = fs->Size(f);
 	fs->Close(f);
 
-	vector<string> testlist = fs->ListDirectory("../../");
+	vector<string> testlist = fs->FileFind("../../*.*");
 
 	glewExperimental = true;
 	glewInit();

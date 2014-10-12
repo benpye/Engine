@@ -11,8 +11,8 @@ class ISearchPath
 public:
 	virtual ~ISearchPath() {}
 
-	virtual bool Exists(string name) = 0;
-	virtual IntFileHandle Open(string name, FileOpen options) = 0;
+	virtual bool Exists(const string &name) = 0;
+	virtual IntFileHandle Open(const string &name, FileOpen options) = 0;
 
 	virtual void Close(IntFileHandle handle) = 0;
 	virtual unsigned int Size(IntFileHandle handle) = 0;
@@ -21,5 +21,5 @@ public:
 	virtual unsigned int Read(IntFileHandle file, void *buf, unsigned int size) = 0;
 	virtual unsigned int Write(IntFileHandle file, const void *buf, unsigned int size) = 0;
 
-	virtual vector<string> ListDirectory(string path) = 0;
+	virtual vector<string> FileFind(const string &wildcard) = 0;
 };

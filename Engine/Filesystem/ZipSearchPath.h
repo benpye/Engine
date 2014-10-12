@@ -4,13 +4,28 @@
 #include "ISearchPath.h"
 
 #include <string>
+#include <unordered_map>
+
+#include <miniz.h>
 
 using namespace std;
 
-class StdioSearchPath : public ISearchPath
+// We build a tree for zips for file searches
+struct ZipNode
+{
+	string name;
+	unsigned int size;
+	unsigned int zipId;
+	bool isDirectory;
+	unordered_map<string, ZipNode *> children;
+	ZipNode *parent = nullptr;
+};
+
+class ZipSearchPath : public ISearchPath
 {
 public:
-	StdioSearchPath(const string &path);
+	ZipSearchPath(const string &zipFile);
+	~ZipSearchPath();
 
 	virtual bool Exists(const string &name) override;
 	virtual IntFileHandle Open(const string &name, FileOpen options) override;
@@ -25,6 +40,9 @@ public:
 	virtual vector<string> FileFind(const string &wildcard) override;
 
 private:
-	string ConstructPath(const string &name);
-	string base;
+	static vector<string> SplitPath(const string &path);
+	static void DeleteNode(ZipNode *n);
+	ZipNode *GetZipNode(const string &path);
+	mz_zip_archive zipArchive;
+	ZipNode *directoryTree;
 };

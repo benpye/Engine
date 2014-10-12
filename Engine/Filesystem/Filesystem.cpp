@@ -1,5 +1,6 @@
 #include "Filesystem.h"
 #include "StdioSearchPath.h"
+#include "ZipSearchPath.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -8,9 +9,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
-
-// We use cstdio as we provide a more C like api to the filesystem
-// This maps easier to the cstdio functions than to iostreams
 
 Filesystem::Filesystem()
 {
@@ -28,7 +26,7 @@ string Filesystem::GetApplicationDirectory()
 #endif
 }
 
-FileHandle Filesystem::Open(string name, FileOpen options)
+FileHandle Filesystem::Open(const string &name, FileOpen options)
 {
 	FSHandle *handle = new FSHandle();
 
@@ -94,7 +92,7 @@ unsigned int Filesystem::Write(FileHandle handle, const void *buf, unsigned int 
 	return f->searchPath->Write(f->fileHandle, buf, size);
 }
 
-bool Filesystem::Exists(string name)
+bool Filesystem::Exists(const string &name)
 {
 	if (writePath != nullptr)
 		if (writePath->Exists(name))
@@ -109,16 +107,16 @@ bool Filesystem::Exists(string name)
 	return false;
 }
 
-vector<string> Filesystem::ListDirectory(string path)
+vector<string> Filesystem::FileFind(const string &wildcard)
 {
 	vector<string> ls;
 
 	if (writePath != nullptr)
-		ls = writePath->ListDirectory(path);
+		ls = writePath->FileFind(wildcard);
 
 	for (auto sp : searchPath)
 	{
-		vector<string> t = sp.second->ListDirectory(path);
+		vector<string> t = sp.second->FileFind(wildcard);
 		if (t.size() == 0) continue;
 		
 		// Join the vectors
@@ -136,7 +134,7 @@ vector<string> Filesystem::ListDirectory(string path)
 	return ls;
 }
 
-void Filesystem::SetWritePath(string path)
+void Filesystem::SetWritePath(const string &path)
 {
 	// Write path is always stdio
 	if (writePath != nullptr)
@@ -145,15 +143,23 @@ void Filesystem::SetWritePath(string path)
 	writePath = new StdioSearchPath(path);
 }
 
-void Filesystem::AddSearchPath(string path)
+void Filesystem::AddSearchPath(const string &path)
 {
 	searchPathOrder.push_back(path);
 	// Assume everything is stdio file system currently
-	ISearchPath *internalPath = new StdioSearchPath(path);
+	ISearchPath *internalPath;
+
+	string extension = path.substr(path.length() - 4);
+
+	if (extension == ".zip")
+		internalPath = new ZipSearchPath(path);
+	else
+		internalPath = new StdioSearchPath(path);
+
 	searchPath[path] = internalPath;
 }
 
-void Filesystem::RemoveSearchPath(string path)
+void Filesystem::RemoveSearchPath(const string &path)
 {
 	// Remove the path from both the ordered list and the interface list
 	searchPathOrder.erase(remove(begin(searchPathOrder), end(searchPathOrder), path), end(searchPathOrder));

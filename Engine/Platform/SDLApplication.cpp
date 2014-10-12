@@ -5,7 +5,7 @@
 
 using namespace std;
 
-SDLApplication::SDLApplication(Configuration *config)
+SDLApplication::SDLApplication(const Configuration &config)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -24,13 +24,13 @@ SDLApplication::SDLApplication(Configuration *config)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
 
 	window = SDL_CreateWindow(
-		config->WindowTitle.c_str(),
+		config.WindowTitle.c_str(),
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		config->Width,
-		config->Height,
+		config.Width,
+		config.Height,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |
-		(config->Fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
+		(config.Fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
 		);
 
 	if (window == nullptr)
@@ -47,7 +47,7 @@ SDLApplication::SDLApplication(Configuration *config)
 		exit(-1);
 	}
 
-	if (config->Vsync)
+	if (config.Vsync)
 	{
 		// Prefer late swap tearing for vsync, fall back to standard vsync if unavaliable
 		if (SDL_GL_SetSwapInterval(-1) < 0)
@@ -59,11 +59,6 @@ SDLApplication::SDLApplication(Configuration *config)
 			}
 		}
 	}
-
-
-	int major, minor;
-	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
-	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
 }
 
 SDLApplication::~SDLApplication()
@@ -78,7 +73,7 @@ void SDLApplication::SwapBuffers()
 	SDL_GL_SwapWindow(window);
 }
 
-void SDLApplication::SetConfiguration(Configuration *config)
+void SDLApplication::SetConfiguration(const Configuration &config)
 {
 	// TODO: Add support for runtime changes to window configuration
 }
