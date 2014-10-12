@@ -3,13 +3,11 @@
 #include <cstdlib>
 #include <iostream>
 
-using namespace std;
-
 SDLApplication::SDLApplication(const Configuration &config)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
-		cout << "SDL_Init Error: " << SDL_GetError() << endl;
+		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		exit(-1);
 	}
 
@@ -35,7 +33,7 @@ SDLApplication::SDLApplication(const Configuration &config)
 
 	if (window == nullptr)
 	{
-		cout << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
+		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
 		exit(-1);
 	}
 
@@ -43,7 +41,7 @@ SDLApplication::SDLApplication(const Configuration &config)
 
 	if (context == nullptr)
 	{
-		cout << "SDL_GL_CreateContext Error: " << SDL_GetError() << endl;
+		std::cout << "SDL_GL_CreateContext Error: " << SDL_GetError() << std::endl;
 		exit(-1);
 	}
 
@@ -52,10 +50,10 @@ SDLApplication::SDLApplication(const Configuration &config)
 		// Prefer late swap tearing for vsync, fall back to standard vsync if unavaliable
 		if (SDL_GL_SetSwapInterval(-1) < 0)
 		{
-			cout << "Warning: Late swap tearing not avaliable (" << SDL_GetError() << ")" << endl;
+			std::cout << "Warning: Late swap tearing not avaliable (" << SDL_GetError() << ")" << std::endl;
 			if (SDL_GL_SetSwapInterval(1) < 0)
 			{
-				cout << "Warning: Vsync not avaliable (" << SDL_GetError() << ")" << endl;
+				std::cout << "Warning: Vsync not avaliable (" << SDL_GetError() << ")" << std::endl;
 			}
 		}
 	}

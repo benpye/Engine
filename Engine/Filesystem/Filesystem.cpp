@@ -10,25 +10,23 @@
 #include <windows.h>
 #endif
 
-using namespace std;
-
 Filesystem::Filesystem()
 {
 	AddSearchPath(GetApplicationDirectory());
 }
 
-string Filesystem::GetApplicationDirectory()
+std::string Filesystem::GetApplicationDirectory()
 {
 #ifdef WIN32
 	TCHAR buffer[MAX_PATH];
 	GetModuleFileName(nullptr, buffer, MAX_PATH);
-	return GetParentDirectory(string(buffer));
+	return GetParentDirectory(std::string(buffer));
 #else
 #error "UNSUPPORTED ON THIS PLATFORM"
 #endif
 }
 
-FileHandle Filesystem::Open(const string &name, FileOpen options)
+FileHandle Filesystem::Open(const std::string &name, FileOpen options)
 {
 	FSHandle *handle = new FSHandle();
 
@@ -94,7 +92,7 @@ unsigned int Filesystem::Write(FileHandle handle, const void *buf, unsigned int 
 	return f->searchPath->Write(f->fileHandle, buf, size);
 }
 
-bool Filesystem::Exists(const string &name)
+bool Filesystem::Exists(const std::string &name)
 {
 	if (writePath != nullptr)
 		if (writePath->Exists(name))
@@ -109,7 +107,7 @@ bool Filesystem::Exists(const string &name)
 	return false;
 }
 
-bool Filesystem::WildcardCompare(const string &str, const string &wildcard)
+bool Filesystem::WildcardCompare(const std::string &str, const std::string &wildcard)
 {
 	unsigned int i = 0;
 	char wc;
@@ -153,27 +151,27 @@ bool Filesystem::WildcardCompare(const string &str, const string &wildcard)
 	return true;
 }
 
-vector<string> Filesystem::FileFind(const string &wildcard)
+std::vector<std::string> Filesystem::FileFind(const std::string &wildcard)
 {
-	vector<string> ls;
+	std::vector<std::string> ls;
 
 	auto found = wildcard.find_last_of('/');
-	string path = "";
-	if(found != string::npos)
+	std::string path = "";
+	if(found != std::string::npos)
 		path = wildcard.substr(0, found);
 
-	string matchString = wildcard.substr(found + 1);
+	std::string matchString = wildcard.substr(found + 1);
 
 	if (writePath != nullptr)
 		ls = writePath->ListDirectory(path);
 
 	for (auto sp : searchPath)
 	{
-		vector<string> t = sp.second->ListDirectory(path);
+		std::vector<std::string> t = sp.second->ListDirectory(path);
 		if (t.size() == 0) continue;
 		
 		// Join the vectors
-		vector<string> n;
+		std::vector<std::string> n;
 		n.reserve(t.size() + ls.size());
 		n.insert(n.end(), ls.begin(), ls.end());
 		n.insert(n.end(), t.begin(), t.end());
@@ -196,7 +194,7 @@ vector<string> Filesystem::FileFind(const string &wildcard)
 	return ls;
 }
 
-void Filesystem::SetWritePath(const string &path)
+void Filesystem::SetWritePath(const std::string &path)
 {
 	// Write path is always stdio
 	if (writePath != nullptr)
@@ -205,13 +203,13 @@ void Filesystem::SetWritePath(const string &path)
 	writePath = new StdioSearchPath(path);
 }
 
-void Filesystem::AddSearchPath(const string &path)
+void Filesystem::AddSearchPath(const std::string &path)
 {
 	searchPathOrder.push_back(path);
 	// Assume everything is stdio file system currently
 	ISearchPath *internalPath;
 
-	string extension = path.substr(path.length() - 4);
+	std::string extension = path.substr(path.length() - 4);
 
 	if (extension == ".zip")
 		internalPath = new ZipSearchPath(path);
@@ -221,14 +219,14 @@ void Filesystem::AddSearchPath(const string &path)
 	searchPath[path] = internalPath;
 }
 
-void Filesystem::RemoveSearchPath(const string &path)
+void Filesystem::RemoveSearchPath(const std::string &path)
 {
 	// Remove the path from both the ordered list and the interface list
 	searchPathOrder.erase(remove(begin(searchPathOrder), end(searchPathOrder), path), end(searchPathOrder));
 	searchPath.erase(path);
 }
 
-vector<string> Filesystem::GetSearchPath()
+std::vector<std::string> Filesystem::GetSearchPath()
 {
 	return searchPathOrder;
 }

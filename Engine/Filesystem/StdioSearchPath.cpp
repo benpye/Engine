@@ -8,18 +8,16 @@
 #include <windows.h>
 #endif
 
-using namespace std;
-
 // We use cstdio as we provide a more C like api to the filesystem
 // This maps easier to the cstdio functions than to iostreams
 // It is also supported more widely (emscripten)
 
-StdioSearchPath::StdioSearchPath(const string &path)
+StdioSearchPath::StdioSearchPath(const std::string &path)
 {
 	base = path;
 }
 
-bool StdioSearchPath::Exists(const string &name)
+bool StdioSearchPath::Exists(const std::string &name)
 {
 	FILE *f = nullptr;
 
@@ -38,7 +36,7 @@ bool StdioSearchPath::Exists(const string &name)
 	return false;
 }
 
-IntFileHandle StdioSearchPath::Open(const string &name, FileOpen options)
+IntFileHandle StdioSearchPath::Open(const std::string &name, FileOpen options)
 {
 	FILE *f = nullptr;
 
@@ -98,23 +96,23 @@ unsigned int StdioSearchPath::Write(IntFileHandle handle, const void *buf, unsig
 	return 0;
 }
 
-vector<string> StdioSearchPath::ListDirectory(const string &path)
+std::vector<std::string> StdioSearchPath::ListDirectory(const std::string &path)
 {
-	vector<string> ls;
+	std::vector<std::string> ls;
 #ifdef WIN32
-	string filter = ConstructPath(path) + "/*";
+	std::string filter = ConstructPath(path) + "/*";
 	WIN32_FIND_DATA findData;
 	HANDLE findHandle = nullptr;
 
 	if ((findHandle = FindFirstFile(filter.c_str(), &findData)) != INVALID_HANDLE_VALUE)
 	{
-		string name;
+		std::string name;
 
 		do
 		{
 			if (strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0)
 			{
-				name = string(findData.cFileName);
+				name = std::string(findData.cFileName);
 				if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 					name += '/';
 
@@ -130,7 +128,7 @@ vector<string> StdioSearchPath::ListDirectory(const string &path)
 	return ls;
 }
 
-string StdioSearchPath::ConstructPath(const string &name)
+std::string StdioSearchPath::ConstructPath(const std::string &name)
 {
 	return base + "/" + name;
 }
