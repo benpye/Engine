@@ -1,4 +1,5 @@
 #include "StdioSearchPath.h"
+#include "PathUtils.h"
 
 #include <string>
 #include <cstdio>
@@ -14,7 +15,50 @@
 
 StdioSearchPath::StdioSearchPath(const std::string& path)
 {
-	base = path;
+#ifdef WIN32
+	char full[MAX_PATH];
+	_fullpath(full, path.c_str(), MAX_PATH);
+	base = std::string(full);
+#else
+#error "UNSUPPORTED ON THIS PLATFORM"
+#endif
+}
+
+std::string StdioSearchPath::RelativeToFullPath(const std::string& name)
+{
+	return base + "/" + name;
+}
+
+bool StdioSearchPath::CreateDirectoryHierarchy(std::string const& name)
+{
+#ifdef WIN32
+	auto splitPath = PathUtils::SplitPath(RelativeToFullPath(name));
+	std::string fullDir = "";
+	BOOL r;
+	DWORD dAttribs;
+
+	for (auto dir : splitPath)
+	{
+		fullDir += dir;
+		fullDir += '/';
+		dAttribs = GetFileAttributes(fullDir.c_str());
+		if (!(dAttribs != INVALID_FILE_ATTRIBUTES && (dAttribs & FILE_ATTRIBUTE_DIRECTORY)))
+		{
+			r = CreateDirectory(fullDir.c_str(), nullptr);
+			if (r == 0)
+				return false;
+		}
+	}
+
+	return true;
+#else
+#error "UNSUPPORTED ON THIS PLATFORM"
+#endif
+}
+
+bool StdioSearchPath::Remove(const std::string& name)
+{
+	return (remove(RelativeToFullPath(name).c_str()) == 0);
 }
 
 bool StdioSearchPath::Exists(const std::string& name)
@@ -22,9 +66,9 @@ bool StdioSearchPath::Exists(const std::string& name)
 	FILE* f = nullptr;
 
 #ifdef _MSC_VER
-	fopen_s(&f, ConstructPath(name).c_str(), "rb");
+	fopen_s(&f, RelativeToFullPath(name).c_str(), "rb");
 #else
-	f = fopen(ConstructPath(name).c_str(), "rb");
+	f = fopen(RelativeToFullPath(name).c_str(), "rb");
 #endif
 
 	if (f)
@@ -41,9 +85,9 @@ IntFileHandle StdioSearchPath::Open(const std::string& name, FileOpen options)
 	FILE* f = nullptr;
 
 #ifdef _MSC_VER
-	fopen_s(&f, ConstructPath(name).c_str(), flags(options & FileOpen::Write) ? "wb" : "rb");
+	fopen_s(&f, RelativeToFullPath(name).c_str(), flags(options & FileOpen::Write) ? "wb" : "rb");
 #else
-	f = fopen(ConstructPath(name).c_str(), flags(options & FileOpen::Write) ? "wb" : "rb");
+	f = fopen(RelativeToFullPath(name).c_str(), flags(options & FileOpen::Write) ? "wb" : "rb");
 #endif
 
 	return f;
@@ -100,7 +144,7 @@ std::vector<std::string> StdioSearchPath::ListDirectory(const std::string& path)
 {
 	std::vector<std::string> ls;
 #ifdef WIN32
-	std::string filter = ConstructPath(path) + "/*";
+	std::string filter = RelativeToFullPath(path) + "/*";
 	WIN32_FIND_DATA findData;
 	HANDLE findHandle = nullptr;
 
@@ -127,9 +171,4 @@ std::vector<std::string> StdioSearchPath::ListDirectory(const std::string& path)
 #error "UNSUPPORTED ON THIS PLATFORM"
 #endif
 	return ls;
-}
-
-std::string StdioSearchPath::ConstructPath(const std::string& name)
-{
-	return base + "/" + name;
 }

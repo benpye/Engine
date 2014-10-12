@@ -10,6 +10,9 @@ class StdioSearchPath : public ISearchPath
 public:
 	StdioSearchPath(const std::string& path);
 
+	virtual std::string RelativeToFullPath(const std::string& name) override;
+	virtual bool CreateDirectoryHierarchy(const std::string& name) override;
+	virtual bool Remove(const std::string& name) override;
 	virtual bool Exists(const std::string& name) override;
 	virtual IntFileHandle Open(const std::string& name, FileOpen options) override;
 
@@ -23,6 +26,5 @@ public:
 	virtual std::vector<std::string> ListDirectory(const std::string& path) override;
 
 private:
-	std::string ConstructPath(const std::string& name);
 	std::string base;
 };

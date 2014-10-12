@@ -36,6 +36,9 @@ public:
 	ZipSearchPath(const ZipSearchPath& other) = delete;
 	ZipSearchPath& operator=(const ZipSearchPath& other) = delete;
 
+	virtual std::string RelativeToFullPath(const std::string& name) override;
+	virtual bool CreateDirectoryHierarchy(const std::string& name) override { return false; };
+	virtual bool Remove(const std::string& name) override { return false; }
 	virtual bool Exists(const std::string& name) override;
 	virtual IntFileHandle Open(const std::string& name, FileOpen options) override;
 
@@ -44,14 +47,14 @@ public:
 	virtual void Seek(IntFileHandle file, int pos, FileSeek origin) override;
 	virtual unsigned int Tell(IntFileHandle file) override;
 	virtual unsigned int Read(IntFileHandle file, void* buf, unsigned int size) override;
-	virtual unsigned int Write(IntFileHandle file, const void* buf, unsigned int size) override;
+	virtual unsigned int Write(IntFileHandle file, const void* buf, unsigned int size) override { return 0; }
 
 	virtual std::vector<std::string> ListDirectory(const std::string& path) override;
 
 private:
-	static std::vector<std::string> SplitPath(const std::string& path);
 	static void DeleteNode(ZipNode* n);
 	ZipNode* GetZipNode(const std::string& path);
 	mz_zip_archive zipArchive;
 	ZipNode* directoryTree;
+	std::string zipName;
 };

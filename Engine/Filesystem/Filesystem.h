@@ -17,8 +17,6 @@ struct FSHandle
 class Filesystem : public IFilesystem
 {
 public:
-	Filesystem();
-
 	virtual FileHandle Open(const std::string& name, FileOpen options) override;
 
 	virtual void Close(FileHandle file) override;
@@ -28,6 +26,9 @@ public:
 	virtual unsigned int Read(FileHandle file, void* buf, unsigned int size) override;
 	virtual unsigned int Write(FileHandle file, const void* buf, unsigned int size) override;
 
+	virtual std::string RelativeToFullPath(const std::string &name) override;
+	virtual bool CreateDirectoryHierarchy(const std::string &name) override;
+	virtual bool Remove(const std::string& name) override;
 	virtual bool Exists(const std::string& name) override;
 
 	virtual std::vector<std::string> FileFind(const std::string& wildcard) override;

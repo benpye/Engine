@@ -3,9 +3,12 @@
 #include <string>
 #include <cstdio>
 #include <algorithm>
+#include "PathUtils.h"
 
 ZipSearchPath::ZipSearchPath(const std::string& zipFile)
 {
+	zipName = zipFile;
+
 	memset(&zipArchive, 0, sizeof(mz_zip_archive));
 	mz_bool status = mz_zip_reader_init_file(&zipArchive, zipFile.c_str(), 0);
 
@@ -21,7 +24,7 @@ ZipSearchPath::ZipSearchPath(const std::string& zipFile)
 		mz_zip_archive_file_stat stat;
 		if (mz_zip_reader_file_stat(&zipArchive, i, &stat))
 		{
-			splitPath = SplitPath(stat.m_filename);
+			splitPath = PathUtils::SplitPath(stat.m_filename);
 
 			ZipNode* n = directoryTree;
 
@@ -62,6 +65,11 @@ void ZipSearchPath::DeleteNode(ZipNode* n)
 			DeleteNode(c.second);
 		}
 	}
+}
+
+std::string ZipSearchPath::RelativeToFullPath(const std::string& name)
+{
+	return zipName + "/" + name;
 }
 
 bool ZipSearchPath::Exists(const std::string& name)
@@ -164,12 +172,6 @@ unsigned int ZipSearchPath::Read(IntFileHandle file, void* buf, unsigned int siz
 	return 0;
 }
 
-unsigned int ZipSearchPath::Write(IntFileHandle file, void const* buf, unsigned size)
-{
-	// Not supported
-	return 0;
-}
-
 std::vector<std::string> ZipSearchPath::ListDirectory(const std::string& path)
 {
 	ZipNode* n = GetZipNode(path);
@@ -192,31 +194,9 @@ std::vector<std::string> ZipSearchPath::ListDirectory(const std::string& path)
 	return ret;
 }
 
-std::vector<std::string> ZipSearchPath::SplitPath(const std::string& path)
-{
-	std::vector<std::string> split;
-	std::string t = "";
-	for (auto c : path)
-	{
-		if (c == '/')
-		{
-			if (t.length() > 0)
-				split.push_back(t);
-			t = "";
-		}
-		else
-			t += c;
-	}
-
-	if (t.length() > 0)
-		split.push_back(t);
-
-	return split;
-}
-
 ZipNode* ZipSearchPath::GetZipNode(const std::string& path)
 {
-	std::vector<std::string> split = SplitPath(path);
+	std::vector<std::string> split = PathUtils::SplitPath(path);
 	ZipNode* n = directoryTree;
 
 	for (auto s : split)

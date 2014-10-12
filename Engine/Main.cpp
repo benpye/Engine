@@ -18,10 +18,14 @@ int main(int argc, char** argv)
 	IApplication* app = new SDLApplication(config);
 
 	IFilesystem* fs = new Filesystem();
+
 	fs->SetWritePath(Filesystem::GetApplicationDirectory());
-	fs->AddSearchPath(Filesystem::GetApplicationDirectory() + "/Test.zip");
+	fs->AddSearchPath(fs->RelativeToFullPath("Test.zip"));
+
+	auto testlist = fs->FileFind("*");
 	bool exists = false;
 	exists = fs->Exists("glew-1.11.0/src/glew.c");
+	fs->Remove("Test2.txt");
 	FileHandle f = fs->Open("test.txt", FileOpen::Write);
 	char* test = "Hello world!\n";
 	fs->Write(f, test, strlen(test));
@@ -29,11 +33,12 @@ int main(int argc, char** argv)
 	fs->Close(f);
 
 	auto t = fs->Open("glew-1.11.0/README.txt");
-	fs->Seek(t, -10, FileSeek::Tail);
+	fs->Seek(t, 4, FileSeek::Head);
+	fs->Seek(t, -2, FileSeek::Current);
 	char *buf = new char[fs->Size(t)];
 	fs->Read(t, buf, fs->Size(t));
 
-	auto testlist = fs->FileFind("*.???");
+	bool r = fs->CreateDirectoryHierarchy("Test/Dir/Structure");
 
 	glewExperimental = true;
 	glewInit();

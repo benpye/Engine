@@ -34,6 +34,9 @@ public:
 	virtual unsigned int Read(FileHandle file, void* buf, unsigned int size) = 0;
 	virtual unsigned int Write(FileHandle file, const void* buf, unsigned int size) = 0;
 
+	virtual std::string RelativeToFullPath(const std::string &name) = 0;
+	virtual bool CreateDirectoryHierarchy(const std::string &name) = 0;
+	virtual bool Remove(const std::string& name) = 0;
 	virtual bool Exists(const std::string& name) = 0;
 
 	virtual std::vector<std::string> FileFind(const std::string& wildcard) = 0;

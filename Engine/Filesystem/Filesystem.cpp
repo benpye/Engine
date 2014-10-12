@@ -10,11 +10,6 @@
 #include <windows.h>
 #endif
 
-Filesystem::Filesystem()
-{
-	AddSearchPath(GetApplicationDirectory());
-}
-
 std::string Filesystem::GetApplicationDirectory()
 {
 #ifdef WIN32
@@ -90,6 +85,37 @@ unsigned int Filesystem::Write(FileHandle handle, const void* buf, unsigned int 
 {
 	FSHandle* f = static_cast<FSHandle *>(handle);
 	return f->searchPath->Write(f->fileHandle, buf, size);
+}
+
+std::string Filesystem::RelativeToFullPath(const std::string& name)
+{
+	if (writePath != nullptr)
+		if (writePath->Exists(name))
+			return writePath->RelativeToFullPath(name);
+
+	for (auto path : searchPath)
+	{
+		if (path.second->Exists(name))
+			return path.second->RelativeToFullPath(name);
+	}
+
+	return "";
+}
+
+bool Filesystem::CreateDirectoryHierarchy(const std::string& name)
+{
+	if (writePath != nullptr)
+		return writePath->CreateDirectoryHierarchy(name);
+
+	return false;
+}
+
+bool Filesystem::Remove(const std::string& name)
+{
+	if (writePath != nullptr)
+		return writePath->Remove(name);
+
+	return false;
 }
 
 bool Filesystem::Exists(const std::string& name)

@@ -9,6 +9,9 @@ class ISearchPath
 public:
 	virtual ~ISearchPath() {}
 
+	virtual std::string RelativeToFullPath(const std::string& name) = 0;
+	virtual bool CreateDirectoryHierarchy(const std::string& name) = 0;
+	virtual bool Remove(const std::string& name) = 0;
 	virtual bool Exists(const std::string& name) = 0;
 	virtual IntFileHandle Open(const std::string& name, FileOpen options) = 0;
 

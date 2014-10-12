@@ -15,6 +15,8 @@ add_executable(Engine
 	Filesystem/ZipSearchPath.cpp
 	Filesystem/ZipSearchPath.h
 	Filesystem/ISearchPath.h
+	Filesystem/PathUtils.cpp
+	Filesystem/PathUtils.h
 	${PUBLIC_INCLUDE}/miniz.c
 	${PUBLIC_INCLUDE}/miniz.h
 )
