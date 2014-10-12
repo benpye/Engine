@@ -10,6 +10,8 @@
 #include <windows.h>
 #endif
 
+using namespace std;
+
 Filesystem::Filesystem()
 {
 	AddSearchPath(GetApplicationDirectory());
@@ -38,7 +40,7 @@ FileHandle Filesystem::Open(const string &name, FileOpen options)
 			return handle;
 	}
 
-	if (options & FileOpenWrite)
+	if (flags(options & FileOpen::Write))
 		return nullptr;
 
 	for (auto path : searchPath)
@@ -109,10 +111,10 @@ bool Filesystem::Exists(const string &name)
 
 bool Filesystem::WildcardCompare(const string &str, const string &wildcard)
 {
-	int i = 0;
+	unsigned int i = 0;
 	char wc;
 	char c;
-	for (int j = 0; j < str.length(); j++)
+	for (unsigned int j = 0; j < str.length(); j++)
 	{
 		if (i >= wildcard.length())
 			return false;
@@ -147,6 +149,8 @@ bool Filesystem::WildcardCompare(const string &str, const string &wildcard)
 
 	if (i != wildcard.length())
 		return false;
+
+	return true;
 }
 
 vector<string> Filesystem::FileFind(const string &wildcard)

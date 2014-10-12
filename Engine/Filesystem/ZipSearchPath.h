@@ -8,27 +8,24 @@
 
 #include <miniz.h>
 
-using namespace std;
-
 // We build a tree for zips for file searches
 struct ZipNode
 {
-	string name;
-	unsigned int size;
+	std::string name;
 	unsigned int zipId;
 	bool isDirectory;
-	unordered_map<string, ZipNode *> children;
+	std::unordered_map<std::string, ZipNode *> children;
 	ZipNode *parent = nullptr;
 };
 
 class ZipSearchPath : public ISearchPath
 {
 public:
-	ZipSearchPath(const string &zipFile);
+	ZipSearchPath(const std::string &zipFile);
 	~ZipSearchPath();
 
-	virtual bool Exists(const string &name) override;
-	virtual IntFileHandle Open(const string &name, FileOpen options) override;
+	virtual bool Exists(const std::string &name) override;
+	virtual IntFileHandle Open(const std::string &name, FileOpen options) override;
 
 	virtual void Close(IntFileHandle handle) override;
 	virtual unsigned int Size(IntFileHandle handle) override;
@@ -37,12 +34,12 @@ public:
 	virtual unsigned int Read(IntFileHandle file, void *buf, unsigned int size) override;
 	virtual unsigned int Write(IntFileHandle file, const void *buf, unsigned int size) override;
 
-	virtual vector<string> ListDirectory(const string &path) override;
+	virtual std::vector<std::string> ListDirectory(const std::string &path) override;
 
 private:
-	static vector<string> SplitPath(const string &path);
+	static std::vector<std::string> SplitPath(const std::string &path);
 	static void DeleteNode(ZipNode *n);
-	ZipNode *GetZipNode(const string &path);
+	ZipNode *GetZipNode(const std::string &path);
 	mz_zip_archive zipArchive;
 	ZipNode *directoryTree;
 };

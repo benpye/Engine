@@ -8,6 +8,8 @@
 #include <windows.h>
 #endif
 
+using namespace std;
+
 // We use cstdio as we provide a more C like api to the filesystem
 // This maps easier to the cstdio functions than to iostreams
 // It is also supported more widely (emscripten)
@@ -20,7 +22,13 @@ StdioSearchPath::StdioSearchPath(const string &path)
 bool StdioSearchPath::Exists(const string &name)
 {
 	FILE *f = nullptr;
+
+#ifdef _MSC_VER
+	fopen_s(&f, ConstructPath(name).c_str(), "rb");
+#else
 	f = fopen(ConstructPath(name).c_str(), "rb");
+#endif
+
 	if (f)
 	{
 		fclose(f);
@@ -33,7 +41,13 @@ bool StdioSearchPath::Exists(const string &name)
 IntFileHandle StdioSearchPath::Open(const string &name, FileOpen options)
 {
 	FILE *f = nullptr;
-	f = fopen(ConstructPath(name).c_str(), (options & FileOpenWrite) ? "wb" : "rb");
+
+#ifdef _MSC_VER
+	fopen_s(&f, ConstructPath(name).c_str(), flags(options & FileOpen::Write) ? "wb" : "rb");
+#else
+	f = fopen(ConstructPath(name).c_str(), flags(options & FileOpen::Write) ? "wb" : "rb");
+#endif
+
 	return f;
 }
 
@@ -57,7 +71,7 @@ unsigned int StdioSearchPath::Size(IntFileHandle handle)
 void StdioSearchPath::Seek(IntFileHandle handle, int pos, FileSeek origin)
 {
 	if (handle != nullptr)
-		fseek(static_cast<FILE *>(handle), pos, origin);
+		fseek(static_cast<FILE *>(handle), pos, static_cast<int>(origin));
 }
 
 unsigned int StdioSearchPath::Tell(IntFileHandle handle)

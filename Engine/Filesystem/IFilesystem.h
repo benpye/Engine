@@ -3,21 +3,22 @@
 #include <string>
 #include <vector>
 
-using namespace std;
+#include <enum_flags.h>
 
 typedef void* FileHandle;
 
-enum FileOpen
+ENUM_FLAGS(FileOpen)
+enum class FileOpen : int
 {
-	FileOpenNone = 0,
-	FileOpenWrite = 1
+	None = 0,
+	Write = 1
 };
 
-enum FileSeek
+enum class FileSeek : int
 {
-	FileSeekHead = SEEK_SET,
-	FileSeekCurrent = SEEK_CUR,
-	FileSeekTail = SEEK_END
+	Head = SEEK_SET,
+	Current = SEEK_CUR,
+	Tail = SEEK_END
 };
 
 class IFilesystem
@@ -25,7 +26,7 @@ class IFilesystem
 public:
 	virtual ~IFilesystem() {}
 
-	virtual FileHandle Open(const string &name, FileOpen options = FileOpenNone) = 0;
+	virtual FileHandle Open(const std::string &name, FileOpen options = FileOpen::None) = 0;
 	virtual void Close(FileHandle file) = 0;
 	virtual unsigned int Size(FileHandle file) = 0;
 	virtual void Seek(FileHandle file, int pos, FileSeek origin) = 0;
@@ -33,16 +34,16 @@ public:
 	virtual unsigned int Read(FileHandle file, void *buf, unsigned int size) = 0;
 	virtual unsigned int Write(FileHandle file, const void *buf, unsigned int size) = 0;
 
-	virtual bool Exists(const string &name) = 0;
+	virtual bool Exists(const std::string &name) = 0;
 
-	virtual vector<string> FileFind(const string &wildcard) = 0;
+	virtual std::vector<std::string> FileFind(const std::string &wildcard) = 0;
 	
-	virtual void SetWritePath(const string &path) = 0;
-	virtual vector<string> GetSearchPath() = 0;
-	virtual void RemoveSearchPath(const string &path) = 0;
-	virtual void AddSearchPath(const string &path) = 0;
+	virtual void SetWritePath(const std::string &path) = 0;
+	virtual std::vector<std::string> GetSearchPath() = 0;
+	virtual void RemoveSearchPath(const std::string &path) = 0;
+	virtual void AddSearchPath(const std::string &path) = 0;
 
-	static string GetParentDirectory(const string &name)
+	static std::string GetParentDirectory(const std::string &name)
 	{
 		size_t pos = name.find_last_of("\\/");
 		return (std::string::npos == pos)

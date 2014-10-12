@@ -2,8 +2,6 @@
 
 #include <string>
 
-using namespace std;
-
 struct Configuration
 {
 	int Width;
@@ -12,7 +10,7 @@ struct Configuration
 	bool Fullscreen;
 	bool Vsync;
 
-	string WindowTitle;
+	std::string WindowTitle;
 };
 
 class IApplication

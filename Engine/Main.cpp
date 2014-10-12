@@ -6,6 +6,8 @@
 
 #include <GL/glew.h>
 
+using namespace std;
+
 int main(int argc, char **argv)
 {
 	Configuration config;
@@ -22,7 +24,7 @@ int main(int argc, char **argv)
 	fs->AddSearchPath(Filesystem::GetApplicationDirectory() + "/Test.zip");
 	bool exists = false;
 	exists = fs->Exists("glew-1.11.0/src/glew.c");
-	FileHandle f = fs->Open("test.txt", FileOpenWrite);
+	FileHandle f = fs->Open("test.txt", FileOpen::Write);
 	char *test = "Hello world!\n";
 	fs->Write(f, test, strlen(test));
 	unsigned int sz = fs->Size(f);

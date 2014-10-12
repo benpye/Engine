@@ -2,7 +2,8 @@
 
 #include <string>
 #include <cstdio>
-#include <iostream>
+
+using namespace std;
 
 ZipSearchPath::ZipSearchPath(const string &zipFile)
 {
@@ -39,7 +40,6 @@ ZipSearchPath::ZipSearchPath(const string &zipFile)
 			}
 
 			n->name = stat.m_filename;
-			n->size = static_cast<unsigned int>(stat.m_uncomp_size);
 			n->zipId = i;
 			n->isDirectory = mz_zip_reader_is_file_a_directory(&zipArchive, i) == MZ_TRUE;
 		}

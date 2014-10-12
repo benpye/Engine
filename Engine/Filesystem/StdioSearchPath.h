@@ -5,15 +5,13 @@
 
 #include <string>
 
-using namespace std;
-
 class StdioSearchPath : public ISearchPath
 {
 public:
-	StdioSearchPath(const string &path);
+	StdioSearchPath(const std::string &path);
 
-	virtual bool Exists(const string &name) override;
-	virtual IntFileHandle Open(const string &name, FileOpen options) override;
+	virtual bool Exists(const std::string &name) override;
+	virtual IntFileHandle Open(const std::string &name, FileOpen options) override;
 
 	virtual void Close(IntFileHandle handle) override;
 	virtual unsigned int Size(IntFileHandle handle) override;
@@ -22,9 +20,9 @@ public:
 	virtual unsigned int Read(IntFileHandle file, void *buf, unsigned int size) override;
 	virtual unsigned int Write(IntFileHandle file, const void *buf, unsigned int size) override;
 
-	virtual vector<string> ListDirectory(const string &path) override;
+	virtual std::vector<std::string> ListDirectory(const std::string &path) override;
 
 private:
-	string ConstructPath(const string &name);
-	string base;
+	std::string ConstructPath(const std::string &name);
+	std::string base;
 };
