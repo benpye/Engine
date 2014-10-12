@@ -42,6 +42,7 @@ public:
 	static string GetApplicationDirectory();
 
 private:
+	static bool WildcardCompare(const string &str, const string &wildcard);
 	// Where search path can be in a pack file, we only support writes directly
 	// to the filesystem
 	vector<string> searchPathOrder;

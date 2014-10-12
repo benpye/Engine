@@ -103,9 +103,26 @@ unsigned int ZipSearchPath::Write(IntFileHandle file, void const* buf, unsigned 
 	return 0;
 }
 
-vector<string> ZipSearchPath::FileFind(const string &wildcard)
+vector<string> ZipSearchPath::ListDirectory(const string &path)
 {
-	return{};
+	ZipNode *n = GetZipNode(path);
+	if (n == nullptr || n->children.empty())
+		return{};
+
+	vector<string> ret;
+
+	string name;
+
+	for (auto c : n->children)
+	{
+		name = c.first;
+		if (c.second->isDirectory)
+			name += '/';
+
+		ret.push_back(name);
+	}
+
+	return ret;
 }
 
 vector<string> ZipSearchPath::SplitPath(const string &path)

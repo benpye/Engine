@@ -84,24 +84,27 @@ unsigned int StdioSearchPath::Write(IntFileHandle handle, const void *buf, unsig
 	return 0;
 }
 
-vector<string> StdioSearchPath::FileFind(const string &wildcard)
+vector<string> StdioSearchPath::ListDirectory(const string &path)
 {
 	vector<string> ls;
 #ifdef WIN32
-	string filter = ConstructPath(wildcard);
+	string filter = ConstructPath(path) + "/*";
 	WIN32_FIND_DATA findData;
 	HANDLE findHandle = nullptr;
 
 	if ((findHandle = FindFirstFile(filter.c_str(), &findData)) != INVALID_HANDLE_VALUE)
 	{
+		string name;
+
 		do
 		{
 			if (strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0)
 			{
+				name = string(findData.cFileName);
 				if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-					ls.push_back(string(findData.cFileName) + "/");
-				else
-					ls.push_back(findData.cFileName);
+					name += '/';
+
+				ls.push_back(name);
 			}
 		} while (FindNextFile(findHandle, &findData));
 

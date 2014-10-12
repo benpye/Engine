@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 	unsigned int sz = fs->Size(f);
 	fs->Close(f);
 
-	vector<string> testlist = fs->FileFind("../../*.*");
+	vector<string> testlist = fs->FileFind("*.???");
 
 	glewExperimental = true;
 	glewInit();

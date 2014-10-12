@@ -21,5 +21,5 @@ public:
 	virtual unsigned int Read(IntFileHandle file, void *buf, unsigned int size) = 0;
 	virtual unsigned int Write(IntFileHandle file, const void *buf, unsigned int size) = 0;
 
-	virtual vector<string> FileFind(const string &wildcard) = 0;
+	virtual vector<string> ListDirectory(const string &path) = 0;
 };

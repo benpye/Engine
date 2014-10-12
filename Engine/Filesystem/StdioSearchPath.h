@@ -22,7 +22,7 @@ public:
 	virtual unsigned int Read(IntFileHandle file, void *buf, unsigned int size) override;
 	virtual unsigned int Write(IntFileHandle file, const void *buf, unsigned int size) override;
 
-	virtual vector<string> FileFind(const string &wildcard) override;
+	virtual vector<string> ListDirectory(const string &path) override;
 
 private:
 	string ConstructPath(const string &name);

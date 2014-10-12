@@ -107,16 +107,65 @@ bool Filesystem::Exists(const string &name)
 	return false;
 }
 
+bool Filesystem::WildcardCompare(const string &str, const string &wildcard)
+{
+	int i = 0;
+	char wc;
+	char c;
+	for (int j = 0; j < str.length(); j++)
+	{
+		if (i >= wildcard.length())
+			return false;
+
+		wc = wildcard[i];
+		c = str[j];
+		// Characters are the same
+		if (c == wc)
+		{
+			i++;
+		}
+		// Single wildcard matches all also
+		else if (wc == '?')
+		{
+			i++;
+		}
+		// Non greedy 0-n wildcard *
+		else if (wc == '*')
+		{
+			// If the next wildcard character matches our current char
+			if (wildcard[i + 1] == c)
+				i+=2;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	if (wc == '*')
+		i++;
+
+	if (i != wildcard.length())
+		return false;
+}
+
 vector<string> Filesystem::FileFind(const string &wildcard)
 {
 	vector<string> ls;
 
+	auto found = wildcard.find_last_of('/');
+	string path = "";
+	if(found != string::npos)
+		path = wildcard.substr(0, found);
+
+	string matchString = wildcard.substr(found + 1);
+
 	if (writePath != nullptr)
-		ls = writePath->FileFind(wildcard);
+		ls = writePath->ListDirectory(path);
 
 	for (auto sp : searchPath)
 	{
-		vector<string> t = sp.second->FileFind(wildcard);
+		vector<string> t = sp.second->ListDirectory(path);
 		if (t.size() == 0) continue;
 		
 		// Join the vectors
@@ -130,6 +179,15 @@ vector<string> Filesystem::FileFind(const string &wildcard)
 	// Sort then remove any duplicate entries
 	sort(ls.begin(), ls.end());
 	ls.erase(unique(ls.begin(), ls.end()), ls.end());
+	
+	// Filter by wildcard here, * means 0-n any character, ? means 1 any character
+	for (auto i = ls.begin(); i != ls.end(); )
+	{
+		if (!WildcardCompare(*i, matchString))
+			i = ls.erase(i);
+		else
+			++i;
+	}
 
 	return ls;
 }
