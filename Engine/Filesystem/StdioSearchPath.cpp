@@ -49,15 +49,15 @@ IntFileHandle StdioSearchPath::Open(const std::string& name, FileOpen options)
 	return f;
 }
 
-void StdioSearchPath::Close(IntFileHandle handle)
+void StdioSearchPath::Close(IntFileHandle file)
 {
-	if (handle != nullptr)
-		fclose(static_cast<FILE *>(handle));
+	if (file != nullptr)
+		fclose(static_cast<FILE *>(file));
 }
 
-unsigned int StdioSearchPath::Size(IntFileHandle handle)
+unsigned int StdioSearchPath::Size(IntFileHandle file)
 {
-	FILE* f = static_cast<FILE *>(handle);
+	FILE* f = static_cast<FILE *>(file);
 
 	int prev = ftell(f);
 	fseek(f, 0L, SEEK_END);
@@ -66,32 +66,32 @@ unsigned int StdioSearchPath::Size(IntFileHandle handle)
 	return len;
 }
 
-void StdioSearchPath::Seek(IntFileHandle handle, int pos, FileSeek origin)
+void StdioSearchPath::Seek(IntFileHandle file, int pos, FileSeek origin)
 {
-	if (handle != nullptr)
-		fseek(static_cast<FILE *>(handle), pos, static_cast<int>(origin));
+	if (file != nullptr)
+		fseek(static_cast<FILE *>(file), pos, static_cast<int>(origin));
 }
 
-unsigned int StdioSearchPath::Tell(IntFileHandle handle)
+unsigned int StdioSearchPath::Tell(IntFileHandle file)
 {
-	if (handle != nullptr)
-		return ftell(static_cast<FILE *>(handle));
+	if (file != nullptr)
+		return ftell(static_cast<FILE *>(file));
 
 	return 0;
 }
 
-unsigned int StdioSearchPath::Read(IntFileHandle handle, void* buf, unsigned int size)
+unsigned int StdioSearchPath::Read(IntFileHandle file, void* buf, unsigned int size)
 {
-	if (handle != nullptr)
-		return fread(buf, 1, size, static_cast<FILE *>(handle));
+	if (file != nullptr)
+		return fread(buf, 1, size, static_cast<FILE *>(file));
 
 	return 0;
 }
 
-unsigned int StdioSearchPath::Write(IntFileHandle handle, const void* buf, unsigned int size)
+unsigned int StdioSearchPath::Write(IntFileHandle file, const void* buf, unsigned int size)
 {
-	if (handle != nullptr)
-		return fwrite(buf, 1, size, static_cast<FILE *>(handle));
+	if (file != nullptr)
+		return fwrite(buf, 1, size, static_cast<FILE *>(file));
 
 	return 0;
 }

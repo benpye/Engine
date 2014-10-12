@@ -28,6 +28,11 @@ int main(int argc, char** argv)
 	unsigned int sz = fs->Size(f);
 	fs->Close(f);
 
+	auto t = fs->Open("glew-1.11.0/README.txt");
+	fs->Seek(t, -10, FileSeek::Tail);
+	char *buf = new char[fs->Size(t)];
+	fs->Read(t, buf, fs->Size(t));
+
 	auto testlist = fs->FileFind("*.???");
 
 	glewExperimental = true;

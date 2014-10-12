@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstdio>
+#include <algorithm>
 
 ZipSearchPath::ZipSearchPath(const std::string& zipFile)
 {
@@ -70,34 +71,102 @@ bool ZipSearchPath::Exists(const std::string& name)
 
 IntFileHandle ZipSearchPath::Open(const std::string& name, FileOpen options)
 {
-	return nullptr;
+	// Zip files don't support writing
+	if(flags(options & FileOpen::Write))
+		return nullptr;
+
+	ZipNode* n = GetZipNode(name);
+	if (n == nullptr)
+		return nullptr;
+
+	ZipFileHandle* h = new ZipFileHandle();
+	h->zipId = n->zipId;
+
+	mz_zip_archive_file_stat stat;
+	if (mz_zip_reader_file_stat(&zipArchive, h->zipId, &stat))
+		h->size = static_cast<unsigned int>(stat.m_uncomp_size);
+
+	return h;
 }
 
-void ZipSearchPath::Close(IntFileHandle handle)
+void ZipSearchPath::Close(IntFileHandle file)
 {
+	ZipFileHandle* h = static_cast<ZipFileHandle*>(file);
+	if (h != nullptr)
+	{
+		if (h->buf != nullptr)
+			delete[] h->buf;
+
+		delete h;
+	}
 }
 
-unsigned int ZipSearchPath::Size(IntFileHandle handle)
+unsigned int ZipSearchPath::Size(IntFileHandle file)
 {
+	ZipFileHandle* h = static_cast<ZipFileHandle*>(file);
+	if (h != nullptr)
+	{
+		return h->size;
+	}
+
 	return 0;
 }
 
-void ZipSearchPath::Seek(IntFileHandle handle, int pos, FileSeek origin)
+void ZipSearchPath::Seek(IntFileHandle file, int pos, FileSeek origin)
 {
+	ZipFileHandle* h = static_cast<ZipFileHandle*>(file);
+	if (h != nullptr)
+	{
+		switch (origin)
+		{
+		case FileSeek::Current:
+			h->pos += pos;
+			break;
+		case FileSeek::Head:
+			h->pos = pos;
+			break;
+		case FileSeek::Tail:
+			h->pos = h->size + pos;
+			break;
+		}
+	}
 }
 
 unsigned int ZipSearchPath::Tell(IntFileHandle file)
 {
+	ZipFileHandle* h = static_cast<ZipFileHandle*>(file);
+	if (h != nullptr)
+	{
+		return h->pos;
+	}
+
 	return 0;
 }
 
-unsigned int ZipSearchPath::Read(IntFileHandle file, void* buf, unsigned size)
+unsigned int ZipSearchPath::Read(IntFileHandle file, void* buf, unsigned int size)
 {
+	ZipFileHandle* h = static_cast<ZipFileHandle*>(file);
+	if (h != nullptr)
+	{
+		// Only allocate and read the file the first time we need the data
+		if (h->buf == nullptr)
+		{
+			h->buf = new char[h->size];
+			mz_zip_reader_extract_to_mem(&zipArchive, h->zipId, h->buf, h->size, 0);
+		}
+
+		unsigned int rPos = std::min(h->pos, h->size);
+		unsigned int rSize = std::min(h->size - rPos, size);
+		std::memcpy(buf, &static_cast<char *>(h->buf)[rPos], rSize);
+		return rSize;
+	}
+
 	return 0;
 }
 
 unsigned int ZipSearchPath::Write(IntFileHandle file, void const* buf, unsigned size)
 {
+	// Not supported
 	return 0;
 }
 

@@ -45,8 +45,8 @@ public:
 
 	static std::string GetParentDirectory(const std::string& name)
 	{
-		size_t pos = name.find_last_of('/');
+		size_t pos = name.find_last_of("\\/");
 		return (std::string::npos == pos)
-			       ? "" : name.substr(0, pos);
+			? "" : name.substr(0, pos);
 	}
 };
