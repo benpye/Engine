@@ -6,24 +6,24 @@
 
 #include <GL/glew.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	Configuration config;
-	config.Fullscreen  = false;
-	config.Vsync       = true;
-	config.Width       = 800;
-	config.Height      = 600;
+	config.Fullscreen = false;
+	config.Vsync = true;
+	config.Width = 800;
+	config.Height = 600;
 	config.WindowTitle = "Hello World!";
 
-	IApplication *app = new SDLApplication(config);
+	IApplication* app = new SDLApplication(config);
 
-	IFilesystem *fs = new Filesystem();
+	IFilesystem* fs = new Filesystem();
 	fs->SetWritePath(Filesystem::GetApplicationDirectory());
 	fs->AddSearchPath(Filesystem::GetApplicationDirectory() + "/Test.zip");
 	bool exists = false;
 	exists = fs->Exists("glew-1.11.0/src/glew.c");
 	FileHandle f = fs->Open("test.txt", FileOpen::Write);
-	char *test = "Hello world!\n";
+	char* test = "Hello world!\n";
 	fs->Write(f, test, strlen(test));
 	unsigned int sz = fs->Size(f);
 	fs->Close(f);

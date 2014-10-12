@@ -15,35 +15,35 @@ struct ZipNode
 	unsigned int zipId;
 	bool isDirectory;
 	std::unordered_map<std::string, ZipNode *> children;
-	ZipNode *parent = nullptr;
+	ZipNode* parent = nullptr;
 };
 
 class ZipSearchPath : public ISearchPath
 {
 public:
-	ZipSearchPath(const std::string &zipFile);
+	ZipSearchPath(const std::string& zipFile);
 	~ZipSearchPath();
 
 	// Disallow copy
-	ZipSearchPath(const ZipSearchPath &other) = delete;
-	ZipSearchPath &operator=(const ZipSearchPath &other) = delete;
+	ZipSearchPath(const ZipSearchPath& other) = delete;
+	ZipSearchPath& operator=(const ZipSearchPath& other) = delete;
 
-	virtual bool Exists(const std::string &name) override;
-	virtual IntFileHandle Open(const std::string &name, FileOpen options) override;
+	virtual bool Exists(const std::string& name) override;
+	virtual IntFileHandle Open(const std::string& name, FileOpen options) override;
 
 	virtual void Close(IntFileHandle handle) override;
 	virtual unsigned int Size(IntFileHandle handle) override;
 	virtual void Seek(IntFileHandle handle, int pos, FileSeek origin) override;
 	virtual unsigned int Tell(IntFileHandle file) override;
-	virtual unsigned int Read(IntFileHandle file, void *buf, unsigned int size) override;
-	virtual unsigned int Write(IntFileHandle file, const void *buf, unsigned int size) override;
+	virtual unsigned int Read(IntFileHandle file, void* buf, unsigned int size) override;
+	virtual unsigned int Write(IntFileHandle file, const void* buf, unsigned int size) override;
 
-	virtual std::vector<std::string> ListDirectory(const std::string &path) override;
+	virtual std::vector<std::string> ListDirectory(const std::string& path) override;
 
 private:
-	static std::vector<std::string> SplitPath(const std::string &path);
-	static void DeleteNode(ZipNode *n);
-	ZipNode *GetZipNode(const std::string &path);
+	static std::vector<std::string> SplitPath(const std::string& path);
+	static void DeleteNode(ZipNode* n);
+	ZipNode* GetZipNode(const std::string& path);
 	mz_zip_archive zipArchive;
-	ZipNode *directoryTree;
+	ZipNode* directoryTree;
 };

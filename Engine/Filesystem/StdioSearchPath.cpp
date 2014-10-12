@@ -12,14 +12,14 @@
 // This maps easier to the cstdio functions than to iostreams
 // It is also supported more widely (emscripten)
 
-StdioSearchPath::StdioSearchPath(const std::string &path)
+StdioSearchPath::StdioSearchPath(const std::string& path)
 {
 	base = path;
 }
 
-bool StdioSearchPath::Exists(const std::string &name)
+bool StdioSearchPath::Exists(const std::string& name)
 {
-	FILE *f = nullptr;
+	FILE* f = nullptr;
 
 #ifdef _MSC_VER
 	fopen_s(&f, ConstructPath(name).c_str(), "rb");
@@ -36,9 +36,9 @@ bool StdioSearchPath::Exists(const std::string &name)
 	return false;
 }
 
-IntFileHandle StdioSearchPath::Open(const std::string &name, FileOpen options)
+IntFileHandle StdioSearchPath::Open(const std::string& name, FileOpen options)
 {
-	FILE *f = nullptr;
+	FILE* f = nullptr;
 
 #ifdef _MSC_VER
 	fopen_s(&f, ConstructPath(name).c_str(), flags(options & FileOpen::Write) ? "wb" : "rb");
@@ -57,7 +57,7 @@ void StdioSearchPath::Close(IntFileHandle handle)
 
 unsigned int StdioSearchPath::Size(IntFileHandle handle)
 {
-	FILE *f = static_cast<FILE *>(handle);
+	FILE* f = static_cast<FILE *>(handle);
 
 	int prev = ftell(f);
 	fseek(f, 0L, SEEK_END);
@@ -80,7 +80,7 @@ unsigned int StdioSearchPath::Tell(IntFileHandle handle)
 	return 0;
 }
 
-unsigned int StdioSearchPath::Read(IntFileHandle handle, void *buf, unsigned int size)
+unsigned int StdioSearchPath::Read(IntFileHandle handle, void* buf, unsigned int size)
 {
 	if (handle != nullptr)
 		return fread(buf, 1, size, static_cast<FILE *>(handle));
@@ -88,7 +88,7 @@ unsigned int StdioSearchPath::Read(IntFileHandle handle, void *buf, unsigned int
 	return 0;
 }
 
-unsigned int StdioSearchPath::Write(IntFileHandle handle, const void *buf, unsigned int size)
+unsigned int StdioSearchPath::Write(IntFileHandle handle, const void* buf, unsigned int size)
 {
 	if (handle != nullptr)
 		return fwrite(buf, 1, size, static_cast<FILE *>(handle));
@@ -96,7 +96,7 @@ unsigned int StdioSearchPath::Write(IntFileHandle handle, const void *buf, unsig
 	return 0;
 }
 
-std::vector<std::string> StdioSearchPath::ListDirectory(const std::string &path)
+std::vector<std::string> StdioSearchPath::ListDirectory(const std::string& path)
 {
 	std::vector<std::string> ls;
 #ifdef WIN32
@@ -118,7 +118,8 @@ std::vector<std::string> StdioSearchPath::ListDirectory(const std::string &path)
 
 				ls.push_back(name);
 			}
-		} while (FindNextFile(findHandle, &findData));
+		}
+		while (FindNextFile(findHandle, &findData));
 
 		FindClose(findHandle);
 	}
@@ -128,7 +129,7 @@ std::vector<std::string> StdioSearchPath::ListDirectory(const std::string &path)
 	return ls;
 }
 
-std::string StdioSearchPath::ConstructPath(const std::string &name)
+std::string StdioSearchPath::ConstructPath(const std::string& name)
 {
 	return base + "/" + name;
 }

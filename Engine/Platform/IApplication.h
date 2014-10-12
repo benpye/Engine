@@ -19,5 +19,5 @@ public:
 	virtual ~IApplication() {}
 
 	virtual void SwapBuffers() = 0;
-	virtual void SetConfiguration(const Configuration &config) = 0;
+	virtual void SetConfiguration(const Configuration& config) = 0;
 };

@@ -26,9 +26,9 @@ std::string Filesystem::GetApplicationDirectory()
 #endif
 }
 
-FileHandle Filesystem::Open(const std::string &name, FileOpen options)
+FileHandle Filesystem::Open(const std::string& name, FileOpen options)
 {
-	FSHandle *handle = new FSHandle();
+	FSHandle* handle = new FSHandle();
 
 	if (writePath != nullptr)
 	{
@@ -58,41 +58,41 @@ FileHandle Filesystem::Open(const std::string &name, FileOpen options)
 
 void Filesystem::Close(FileHandle handle)
 {
-	FSHandle *f = static_cast<FSHandle *>(handle);
+	FSHandle* f = static_cast<FSHandle *>(handle);
 	f->searchPath->Close(f->fileHandle);
 }
 
 unsigned int Filesystem::Size(FileHandle handle)
 {
-	FSHandle *f = static_cast<FSHandle *>(handle);
+	FSHandle* f = static_cast<FSHandle *>(handle);
 	return f->searchPath->Size(f->fileHandle);
 }
 
 void Filesystem::Seek(FileHandle handle, int pos, FileSeek origin)
 {
-	FSHandle *f = static_cast<FSHandle *>(handle);
+	FSHandle* f = static_cast<FSHandle *>(handle);
 	return f->searchPath->Seek(f->fileHandle, pos, origin);
 }
 
 unsigned int Filesystem::Tell(FileHandle handle)
 {
-	FSHandle *f = static_cast<FSHandle *>(handle);
+	FSHandle* f = static_cast<FSHandle *>(handle);
 	return f->searchPath->Tell(f->fileHandle);
 }
 
-unsigned int Filesystem::Read(FileHandle handle, void *buf, unsigned int size)
+unsigned int Filesystem::Read(FileHandle handle, void* buf, unsigned int size)
 {
-	FSHandle *f = static_cast<FSHandle *>(handle);
+	FSHandle* f = static_cast<FSHandle *>(handle);
 	return f->searchPath->Read(f->fileHandle, buf, size);
 }
 
-unsigned int Filesystem::Write(FileHandle handle, const void *buf, unsigned int size)
+unsigned int Filesystem::Write(FileHandle handle, const void* buf, unsigned int size)
 {
-	FSHandle *f = static_cast<FSHandle *>(handle);
+	FSHandle* f = static_cast<FSHandle *>(handle);
 	return f->searchPath->Write(f->fileHandle, buf, size);
 }
 
-bool Filesystem::Exists(const std::string &name)
+bool Filesystem::Exists(const std::string& name)
 {
 	if (writePath != nullptr)
 		if (writePath->Exists(name))
@@ -107,7 +107,7 @@ bool Filesystem::Exists(const std::string &name)
 	return false;
 }
 
-bool Filesystem::WildcardCompare(const std::string &str, const std::string &wildcard)
+bool Filesystem::WildcardCompare(const std::string& str, const std::string& wildcard)
 {
 	unsigned int i = 0;
 	char wc;
@@ -134,7 +134,7 @@ bool Filesystem::WildcardCompare(const std::string &str, const std::string &wild
 		{
 			// If the next wildcard character matches our current char
 			if (wildcard[i + 1] == c)
-				i+=2;
+				i += 2;
 		}
 		else
 		{
@@ -151,13 +151,13 @@ bool Filesystem::WildcardCompare(const std::string &str, const std::string &wild
 	return true;
 }
 
-std::vector<std::string> Filesystem::FileFind(const std::string &wildcard)
+std::vector<std::string> Filesystem::FileFind(const std::string& wildcard)
 {
 	std::vector<std::string> ls;
 
 	auto found = wildcard.find_last_of('/');
 	std::string path = "";
-	if(found != std::string::npos)
+	if (found != std::string::npos)
 		path = wildcard.substr(0, found);
 
 	std::string matchString = wildcard.substr(found + 1);
@@ -169,7 +169,7 @@ std::vector<std::string> Filesystem::FileFind(const std::string &wildcard)
 	{
 		std::vector<std::string> t = sp.second->ListDirectory(path);
 		if (t.size() == 0) continue;
-		
+
 		// Join the vectors
 		std::vector<std::string> n;
 		n.reserve(t.size() + ls.size());
@@ -181,9 +181,9 @@ std::vector<std::string> Filesystem::FileFind(const std::string &wildcard)
 	// Sort then remove any duplicate entries
 	sort(ls.begin(), ls.end());
 	ls.erase(unique(ls.begin(), ls.end()), ls.end());
-	
+
 	// Filter by wildcard here, * means 0-n any character, ? means 1 any character
-	for (auto i = ls.begin(); i != ls.end(); )
+	for (auto i = ls.begin(); i != ls.end();)
 	{
 		if (!WildcardCompare(*i, matchString))
 			i = ls.erase(i);
@@ -194,7 +194,7 @@ std::vector<std::string> Filesystem::FileFind(const std::string &wildcard)
 	return ls;
 }
 
-void Filesystem::SetWritePath(const std::string &path)
+void Filesystem::SetWritePath(const std::string& path)
 {
 	// Write path is always stdio
 	if (writePath != nullptr)
@@ -203,11 +203,11 @@ void Filesystem::SetWritePath(const std::string &path)
 	writePath = new StdioSearchPath(path);
 }
 
-void Filesystem::AddSearchPath(const std::string &path)
+void Filesystem::AddSearchPath(const std::string& path)
 {
 	searchPathOrder.push_back(path);
 	// Assume everything is stdio file system currently
-	ISearchPath *internalPath;
+	ISearchPath* internalPath;
 
 	std::string extension = path.substr(path.length() - 4);
 
@@ -219,7 +219,7 @@ void Filesystem::AddSearchPath(const std::string &path)
 	searchPath[path] = internalPath;
 }
 
-void Filesystem::RemoveSearchPath(const std::string &path)
+void Filesystem::RemoveSearchPath(const std::string& path)
 {
 	// Remove the path from both the ordered list and the interface list
 	searchPathOrder.erase(remove(begin(searchPathOrder), end(searchPathOrder), path), end(searchPathOrder));

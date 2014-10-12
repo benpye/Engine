@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 
-SDLApplication::SDLApplication(const Configuration &config)
+SDLApplication::SDLApplication(const Configuration& config)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -29,7 +29,7 @@ SDLApplication::SDLApplication(const Configuration &config)
 		config.Height,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |
 		(config.Fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
-		);
+	);
 
 	if (window == nullptr)
 	{
@@ -71,7 +71,7 @@ void SDLApplication::SwapBuffers()
 	SDL_GL_SwapWindow(window);
 }
 
-void SDLApplication::SetConfiguration(const Configuration &config)
+void SDLApplication::SetConfiguration(const Configuration& config)
 {
 	// TODO: Add support for runtime changes to window configuration
 }

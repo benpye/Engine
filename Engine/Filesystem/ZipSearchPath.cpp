@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdio>
 
-ZipSearchPath::ZipSearchPath(const std::string &zipFile)
+ZipSearchPath::ZipSearchPath(const std::string& zipFile)
 {
 	memset(&zipArchive, 0, sizeof(mz_zip_archive));
 	mz_bool status = mz_zip_reader_init_file(&zipArchive, zipFile.c_str(), 0);
@@ -18,11 +18,11 @@ ZipSearchPath::ZipSearchPath(const std::string &zipFile)
 	for (unsigned int i = 0; i < mz_zip_reader_get_num_files(&zipArchive); i++)
 	{
 		mz_zip_archive_file_stat stat;
-		if(mz_zip_reader_file_stat(&zipArchive, i, &stat))
+		if (mz_zip_reader_file_stat(&zipArchive, i, &stat))
 		{
 			splitPath = SplitPath(stat.m_filename);
 
-			ZipNode *n = directoryTree;
+			ZipNode* n = directoryTree;
 
 			for (auto p : splitPath)
 			{
@@ -50,7 +50,7 @@ ZipSearchPath::~ZipSearchPath()
 	DeleteNode(directoryTree);
 }
 
-void ZipSearchPath::DeleteNode(ZipNode *n)
+void ZipSearchPath::DeleteNode(ZipNode* n)
 {
 	if (n->children.empty())
 		delete n;
@@ -63,12 +63,12 @@ void ZipSearchPath::DeleteNode(ZipNode *n)
 	}
 }
 
-bool ZipSearchPath::Exists(const std::string &name)
+bool ZipSearchPath::Exists(const std::string& name)
 {
 	return GetZipNode(name) != nullptr;
 }
 
-IntFileHandle ZipSearchPath::Open(const std::string &name, FileOpen options)
+IntFileHandle ZipSearchPath::Open(const std::string& name, FileOpen options)
 {
 	return nullptr;
 }
@@ -101,9 +101,9 @@ unsigned int ZipSearchPath::Write(IntFileHandle file, void const* buf, unsigned 
 	return 0;
 }
 
-std::vector<std::string> ZipSearchPath::ListDirectory(const std::string &path)
+std::vector<std::string> ZipSearchPath::ListDirectory(const std::string& path)
 {
-	ZipNode *n = GetZipNode(path);
+	ZipNode* n = GetZipNode(path);
 	if (n == nullptr || n->children.empty())
 		return{};
 
@@ -123,7 +123,7 @@ std::vector<std::string> ZipSearchPath::ListDirectory(const std::string &path)
 	return ret;
 }
 
-std::vector<std::string> ZipSearchPath::SplitPath(const std::string &path)
+std::vector<std::string> ZipSearchPath::SplitPath(const std::string& path)
 {
 	std::vector<std::string> split;
 	std::string t = "";
@@ -145,10 +145,10 @@ std::vector<std::string> ZipSearchPath::SplitPath(const std::string &path)
 	return split;
 }
 
-ZipNode *ZipSearchPath::GetZipNode(const std::string &path)
+ZipNode* ZipSearchPath::GetZipNode(const std::string& path)
 {
 	std::vector<std::string> split = SplitPath(path);
-	ZipNode *n = directoryTree;
+	ZipNode* n = directoryTree;
 
 	for (auto s : split)
 	{
