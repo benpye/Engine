@@ -61,23 +61,17 @@ bool StdioSearchPath::Remove(const std::string& name)
 	return (remove(RelativeToFullPath(name).c_str()) == 0);
 }
 
-bool StdioSearchPath::Exists(const std::string& name)
+FileExists StdioSearchPath::Exists(const std::string& name)
 {
-	FILE* f = nullptr;
+#ifdef WIN32
+	DWORD dAttribs = GetFileAttributes(RelativeToFullPath(name).c_str());
+	if (dAttribs == INVALID_FILE_ATTRIBUTES)
+		return FileExists::None;
 
-#ifdef _MSC_VER
-	fopen_s(&f, RelativeToFullPath(name).c_str(), "rb");
+	return (dAttribs & FILE_ATTRIBUTE_DIRECTORY) ? FileExists::Directory : FileExists::File;
 #else
-	f = fopen(RelativeToFullPath(name).c_str(), "rb");
+#error "UNSUPPORTED ON THIS PLATFORM"
 #endif
-
-	if (f)
-	{
-		fclose(f);
-		return true;
-	}
-
-	return false;
 }
 
 IntFileHandle StdioSearchPath::Open(const std::string& name, FileOpen options)

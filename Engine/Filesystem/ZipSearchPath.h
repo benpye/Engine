@@ -39,7 +39,7 @@ public:
 	virtual std::string RelativeToFullPath(const std::string& name) override;
 	virtual bool CreateDirectoryHierarchy(const std::string& name) override { return false; };
 	virtual bool Remove(const std::string& name) override { return false; }
-	virtual bool Exists(const std::string& name) override;
+	virtual FileExists Exists(const std::string& name) override;
 	virtual IntFileHandle Open(const std::string& name, FileOpen options) override;
 
 	virtual void Close(IntFileHandle file) override;

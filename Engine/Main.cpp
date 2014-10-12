@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 	fs->AddSearchPath(fs->RelativeToFullPath("Test.zip"));
 
 	auto testlist = fs->FileFind("*");
-	bool exists = false;
+	FileExists exists = FileExists::None;
 	exists = fs->Exists("glew-1.11.0/src/glew.c");
 	fs->Remove("Test2.txt");
 	FileHandle f = fs->Open("test.txt", FileOpen::Write);
@@ -39,6 +39,10 @@ int main(int argc, char** argv)
 	fs->Read(t, buf, fs->Size(t));
 
 	bool r = fs->CreateDirectoryHierarchy("Test/Dir/Structure");
+
+	auto e2 = fs->Exists("TestDirectory");
+	auto e3 = fs->Exists("glew-1.11.0");
+	auto e4 = fs->Exists("SDL2.dll");
 
 	glewExperimental = true;
 	glewInit();

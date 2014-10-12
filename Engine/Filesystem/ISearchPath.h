@@ -12,7 +12,7 @@ public:
 	virtual std::string RelativeToFullPath(const std::string& name) = 0;
 	virtual bool CreateDirectoryHierarchy(const std::string& name) = 0;
 	virtual bool Remove(const std::string& name) = 0;
-	virtual bool Exists(const std::string& name) = 0;
+	virtual FileExists Exists(const std::string& name) = 0;
 	virtual IntFileHandle Open(const std::string& name, FileOpen options) = 0;
 
 	virtual void Close(IntFileHandle file) = 0;

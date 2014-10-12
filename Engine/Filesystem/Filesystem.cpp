@@ -38,7 +38,7 @@ FileHandle Filesystem::Open(const std::string& name, FileOpen options)
 
 	for (auto path : searchPath)
 	{
-		if (path.second->Exists(name))
+		if (path.second->Exists(name) == FileExists::File)
 		{
 			handle->searchPath = path.second;
 			handle->fileHandle = path.second->Open(name, options);
@@ -90,12 +90,12 @@ unsigned int Filesystem::Write(FileHandle handle, const void* buf, unsigned int 
 std::string Filesystem::RelativeToFullPath(const std::string& name)
 {
 	if (writePath != nullptr)
-		if (writePath->Exists(name))
+		if (writePath->Exists(name) == FileExists::File)
 			return writePath->RelativeToFullPath(name);
 
 	for (auto path : searchPath)
 	{
-		if (path.second->Exists(name))
+		if (path.second->Exists(name) == FileExists::File)
 			return path.second->RelativeToFullPath(name);
 	}
 
@@ -118,25 +118,31 @@ bool Filesystem::Remove(const std::string& name)
 	return false;
 }
 
-bool Filesystem::Exists(const std::string& name)
+FileExists Filesystem::Exists(const std::string& name)
 {
+	FileExists e;
+
 	if (writePath != nullptr)
-		if (writePath->Exists(name))
-			return true;
+	{
+		e = writePath->Exists(name);
+		if (e != FileExists::None)
+			return e;
+	}
 
 	for (auto path : searchPath)
 	{
-		if (path.second->Exists(name))
-			return true;
+		e = path.second->Exists(name);
+		if (e != FileExists::None)
+			return e;
 	}
 
-	return false;
+	return FileExists::None;
 }
 
 bool Filesystem::WildcardCompare(const std::string& str, const std::string& wildcard)
 {
 	unsigned int i = 0;
-	char wc;
+	char wc = ' ';
 	char c;
 	for (unsigned int j = 0; j < str.length(); j++)
 	{

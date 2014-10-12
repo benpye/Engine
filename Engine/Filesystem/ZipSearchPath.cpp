@@ -72,9 +72,13 @@ std::string ZipSearchPath::RelativeToFullPath(const std::string& name)
 	return zipName + "/" + name;
 }
 
-bool ZipSearchPath::Exists(const std::string& name)
+FileExists ZipSearchPath::Exists(const std::string& name)
 {
-	return GetZipNode(name) != nullptr;
+	ZipNode* n = GetZipNode(name);
+	if (n == nullptr)
+		return FileExists::None;
+
+	return n->isDirectory ? FileExists::Directory : FileExists::File;
 }
 
 IntFileHandle ZipSearchPath::Open(const std::string& name, FileOpen options)

@@ -29,7 +29,7 @@ public:
 	virtual std::string RelativeToFullPath(const std::string &name) override;
 	virtual bool CreateDirectoryHierarchy(const std::string &name) override;
 	virtual bool Remove(const std::string& name) override;
-	virtual bool Exists(const std::string& name) override;
+	virtual FileExists Exists(const std::string& name) override;
 
 	virtual std::vector<std::string> FileFind(const std::string& wildcard) override;
 
