@@ -24,6 +24,10 @@ public:
 	ZipSearchPath(const std::string &zipFile);
 	~ZipSearchPath();
 
+	// Disallow copy
+	ZipSearchPath(const ZipSearchPath &other) = delete;
+	ZipSearchPath &operator=(const ZipSearchPath &other) = delete;
+
 	virtual bool Exists(const std::string &name) override;
 	virtual IntFileHandle Open(const std::string &name, FileOpen options) override;
 
