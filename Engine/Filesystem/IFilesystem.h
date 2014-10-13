@@ -52,11 +52,4 @@ public:
 	virtual std::vector<std::string> GetSearchPath() = 0;
 	virtual void RemoveSearchPath(const std::string& path) = 0;
 	virtual void AddSearchPath(const std::string& path) = 0;
-
-	static std::string GetParentDirectory(const std::string& name)
-	{
-		size_t pos = name.find_last_of("\\/");
-		return (std::string::npos == pos)
-			? "" : name.substr(0, pos);
-	}
 };

@@ -29,13 +29,14 @@ struct ZipFileHandle
 class ZipSearchPath : public ISearchPath
 {
 public:
-	ZipSearchPath(const std::string& zipFile);
+	ZipSearchPath() = default;
 	~ZipSearchPath();
 
 	// Disallow copy
 	ZipSearchPath(const ZipSearchPath& other) = delete;
 	ZipSearchPath& operator=(const ZipSearchPath& other) = delete;
 
+	virtual bool Init(const std::string& name) override;
 	virtual std::string RelativeToFullPath(const std::string& name) override;
 	virtual bool CreateDirectoryHierarchy(const std::string& name) override { return false; };
 	virtual bool Remove(const std::string& name) override { return false; }

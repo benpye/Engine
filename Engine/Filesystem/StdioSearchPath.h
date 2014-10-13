@@ -8,8 +8,7 @@
 class StdioSearchPath : public ISearchPath
 {
 public:
-	StdioSearchPath(const std::string& path);
-
+	virtual bool Init(const std::string& name) override;
 	virtual std::string RelativeToFullPath(const std::string& name) override;
 	virtual bool CreateDirectoryHierarchy(const std::string& name) override;
 	virtual bool Remove(const std::string& name) override;

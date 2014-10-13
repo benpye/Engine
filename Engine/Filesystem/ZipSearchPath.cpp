@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "PathUtils.h"
 
-ZipSearchPath::ZipSearchPath(const std::string& zipFile)
+bool ZipSearchPath::Init(const std::string& zipFile)
 {
 	zipName = zipFile;
 
@@ -13,7 +13,7 @@ ZipSearchPath::ZipSearchPath(const std::string& zipFile)
 	mz_bool status = mz_zip_reader_init_file(&zipArchive, zipFile.c_str(), 0);
 
 	if (!status)
-		return;
+		return false;
 
 	std::vector<std::string> splitPath;
 
@@ -46,6 +46,8 @@ ZipSearchPath::ZipSearchPath(const std::string& zipFile)
 			n->isDirectory = mz_zip_reader_is_file_a_directory(&zipArchive, i) == MZ_TRUE;
 		}
 	}
+
+	return true;
 }
 
 ZipSearchPath::~ZipSearchPath()

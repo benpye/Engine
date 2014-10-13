@@ -6,7 +6,7 @@
 class SDLApplication : public IApplication
 {
 public:
-	SDLApplication(const Configuration& config);
+	explicit SDLApplication(const Configuration& config);
 	~SDLApplication();
 
 	// Disallow copy

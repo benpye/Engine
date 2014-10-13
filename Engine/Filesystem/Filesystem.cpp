@@ -1,6 +1,7 @@
 #include "Filesystem.h"
 #include "StdioSearchPath.h"
 #include "ZipSearchPath.h"
+#include "PathUtils.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -15,7 +16,7 @@ std::string Filesystem::GetApplicationDirectory()
 #ifdef WIN32
 	TCHAR buffer[MAX_PATH];
 	GetModuleFileName(nullptr, buffer, MAX_PATH);
-	return GetParentDirectory(std::string(buffer));
+	return PathUtils::GetParentDirectory(std::string(buffer));
 #else
 #error "UNSUPPORTED ON THIS PLATFORM"
 #endif
@@ -228,11 +229,20 @@ std::vector<std::string> Filesystem::FileFind(const std::string& wildcard)
 
 void Filesystem::SetWritePath(const std::string& path)
 {
+
+	StdioSearchPath* tempPath = new StdioSearchPath();
+
+	if (!tempPath->Init(path))
+	{
+		delete tempPath;
+		return;
+	}
+
 	// Write path is always stdio
 	if (writePath != nullptr)
 		delete writePath;
 
-	writePath = new StdioSearchPath(path);
+	writePath = tempPath;
 }
 
 void Filesystem::AddSearchPath(const std::string& path)
@@ -244,9 +254,15 @@ void Filesystem::AddSearchPath(const std::string& path)
 	std::string extension = path.substr(path.length() - 4);
 
 	if (extension == ".zip")
-		internalPath = new ZipSearchPath(path);
+		internalPath = new ZipSearchPath();
 	else
-		internalPath = new StdioSearchPath(path);
+		internalPath = new StdioSearchPath();
+
+	if (!internalPath->Init(path))
+	{
+		delete internalPath;
+		return;
+	}
 
 	searchPath[path] = internalPath;
 }

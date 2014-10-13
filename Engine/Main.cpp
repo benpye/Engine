@@ -51,11 +51,11 @@ int main(int argc, char** argv)
 
 	while (true)
 	{
-		glClearColor(sinf(x), cosf(x), 1 - sinf(x), 1.0);
+		glClearColor(abs(sinf(x)), abs(sinf(x + 1.57079632679f)), abs(sinf(x + 0.78539816339f)), 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 		app->SwapBuffers();
 
-		x += 0.1f;
+		x += 0.05f;
 	}
 
 	return 0;

@@ -13,15 +13,19 @@
 // This maps easier to the cstdio functions than to iostreams
 // It is also supported more widely (emscripten)
 
-StdioSearchPath::StdioSearchPath(const std::string& path)
+bool StdioSearchPath::Init(const std::string& path)
 {
 #ifdef WIN32
 	char full[MAX_PATH];
-	_fullpath(full, path.c_str(), MAX_PATH);
+	if (!_fullpath(full, path.c_str(), MAX_PATH))
+		return false;
+
 	base = std::string(full);
 #else
 #error "UNSUPPORTED ON THIS PLATFORM"
 #endif
+
+	return true;
 }
 
 std::string StdioSearchPath::RelativeToFullPath(const std::string& name)
