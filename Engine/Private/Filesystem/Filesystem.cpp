@@ -28,7 +28,7 @@ FileHandle Filesystem::Open(const std::string& name, FileOpen options)
 
 	if (writePath != nullptr)
 	{
-		handle->searchPath = writePath;
+		handle->searchPath = writePath.get();
 		handle->fileHandle = writePath->Open(name, options);
 		if (handle->fileHandle != nullptr)
 			return handle;
@@ -37,11 +37,11 @@ FileHandle Filesystem::Open(const std::string& name, FileOpen options)
 	if (flags(options & FileOpen::Write))
 		return nullptr;
 
-	for (auto path : searchPath)
+	for (auto const& path : searchPath)
 	{
 		if (path.second->Exists(name) == FileExists::File)
 		{
-			handle->searchPath = path.second;
+			handle->searchPath = path.second.get();
 			handle->fileHandle = path.second->Open(name, options);
 			if (handle->fileHandle == nullptr)
 				return nullptr;
@@ -94,7 +94,7 @@ std::string Filesystem::RelativeToFullPath(const std::string& name)
 		if (writePath->Exists(name) == FileExists::File)
 			return writePath->RelativeToFullPath(name);
 
-	for (auto path : searchPath)
+	for (auto const& path : searchPath)
 	{
 		if (path.second->Exists(name) == FileExists::File)
 			return path.second->RelativeToFullPath(name);
@@ -130,7 +130,7 @@ FileExists Filesystem::Exists(const std::string& name)
 			return e;
 	}
 
-	for (auto path : searchPath)
+	for (auto const& path : searchPath)
 	{
 		e = path.second->Exists(name);
 		if (e != FileExists::None)
@@ -198,7 +198,7 @@ std::vector<std::string> Filesystem::FileFind(const std::string& wildcard)
 	if (writePath != nullptr)
 		ls = writePath->ListDirectory(path);
 
-	for (auto sp : searchPath)
+	for (auto const& sp : searchPath)
 	{
 		std::vector<std::string> t = sp.second->ListDirectory(path);
 		if (t.size() == 0) continue;
@@ -230,41 +230,31 @@ std::vector<std::string> Filesystem::FileFind(const std::string& wildcard)
 void Filesystem::SetWritePath(const std::string& path)
 {
 
-	StdioSearchPath* tempPath = new StdioSearchPath();
+	std::unique_ptr<ISearchPath> tempPath(new StdioSearchPath());
 
 	if (!tempPath->Init(path))
-	{
-		delete tempPath;
 		return;
-	}
 
 	// Write path is always stdio
-	if (writePath != nullptr)
-		delete writePath;
-
-	writePath = tempPath;
+	writePath = std::move(tempPath);
 }
 
 void Filesystem::AddSearchPath(const std::string& path)
 {
 	searchPathOrder.push_back(path);
-	// Assume everything is stdio file system currently
-	ISearchPath* internalPath;
+	std::unique_ptr<ISearchPath> internalPath;
 
 	std::string extension = path.substr(path.length() - 4);
 
 	if (extension == ".zip")
-		internalPath = new ZipSearchPath();
+		internalPath = std::unique_ptr<ISearchPath>(new ZipSearchPath());
 	else
-		internalPath = new StdioSearchPath();
+		internalPath = std::unique_ptr<ISearchPath>(new StdioSearchPath());
 
 	if (!internalPath->Init(path))
-	{
-		delete internalPath;
 		return;
-	}
 
-	searchPath[path] = internalPath;
+	searchPath[path] = std::move(internalPath);
 }
 
 void Filesystem::RemoveSearchPath(const std::string& path)

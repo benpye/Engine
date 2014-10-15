@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <cstdio>
+#include <memory>
 
 struct FSHandle
 {
@@ -45,6 +45,6 @@ private:
 	// Where search path can be in a pack file, we only support writes directly
 	// to the filesystem
 	std::vector<std::string> searchPathOrder;
-	std::unordered_map<std::string, ISearchPath*> searchPath;
-	ISearchPath* writePath = nullptr;
+	std::unordered_map<std::string, std::unique_ptr<ISearchPath>> searchPath;
+	std::unique_ptr<ISearchPath> writePath;
 };
