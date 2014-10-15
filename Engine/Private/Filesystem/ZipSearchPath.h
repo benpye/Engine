@@ -5,6 +5,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 #include <miniz.h>
 
@@ -14,7 +15,7 @@ struct ZipNode
 	std::string name;
 	unsigned int zipId;
 	bool isDirectory;
-	std::unordered_map<std::string, ZipNode *> children;
+	std::unordered_map<std::string, std::unique_ptr<ZipNode>> children;
 	ZipNode* parent = nullptr;
 };
 
@@ -53,9 +54,8 @@ public:
 	virtual std::vector<std::string> ListDirectory(const std::string& path) override;
 
 private:
-	static void DeleteNode(ZipNode* n);
 	ZipNode* GetZipNode(const std::string& path);
 	mz_zip_archive zipArchive;
-	ZipNode* directoryTree;
+	ZipNode directoryTree;
 	std::string zipName;
 };

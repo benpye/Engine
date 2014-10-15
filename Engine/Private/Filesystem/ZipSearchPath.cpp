@@ -17,8 +17,6 @@ bool ZipSearchPath::Init(const std::string& zipFile)
 
 	std::vector<std::string> splitPath;
 
-	directoryTree = new ZipNode();
-
 	for (unsigned int i = 0; i < mz_zip_reader_get_num_files(&zipArchive); i++)
 	{
 		mz_zip_archive_file_stat stat;
@@ -26,19 +24,19 @@ bool ZipSearchPath::Init(const std::string& zipFile)
 		{
 			splitPath = PathUtils::SplitPath(stat.m_filename);
 
-			ZipNode* n = directoryTree;
+			ZipNode* n = &directoryTree;
 
 			for (auto p : splitPath)
 			{
 				auto i = n->children.find(p);
 				if (i == n->children.end())
 				{
-					n->children[p] = new ZipNode();
+					n->children[p] = std::unique_ptr<ZipNode>(new ZipNode());
 					n->children[p]->parent = n;
-					n = n->children[p];
+					n = n->children[p].get();
 				}
 				else
-					n = i->second;
+					n = i->second.get();
 			}
 
 			n->name = stat.m_filename;
@@ -53,20 +51,6 @@ bool ZipSearchPath::Init(const std::string& zipFile)
 ZipSearchPath::~ZipSearchPath()
 {
 	mz_zip_reader_end(&zipArchive);
-	DeleteNode(directoryTree);
-}
-
-void ZipSearchPath::DeleteNode(ZipNode* n)
-{
-	if (n->children.empty())
-		delete n;
-	else
-	{
-		for (auto c : n->children)
-		{
-			DeleteNode(c.second);
-		}
-	}
 }
 
 std::string ZipSearchPath::RelativeToFullPath(const std::string& name)
@@ -188,7 +172,7 @@ std::vector<std::string> ZipSearchPath::ListDirectory(const std::string& path)
 
 	std::string name;
 
-	for (auto c : n->children)
+	for (auto const& c : n->children)
 	{
 		name = c.first;
 		if (c.second->isDirectory)
@@ -203,7 +187,7 @@ std::vector<std::string> ZipSearchPath::ListDirectory(const std::string& path)
 ZipNode* ZipSearchPath::GetZipNode(const std::string& path)
 {
 	std::vector<std::string> split = PathUtils::SplitPath(path);
-	ZipNode* n = directoryTree;
+	ZipNode* n = &directoryTree;
 
 	for (auto s : split)
 	{
@@ -224,7 +208,7 @@ ZipNode* ZipSearchPath::GetZipNode(const std::string& path)
 			if (i == n->children.end())
 				return nullptr;
 
-			n = i->second;
+			n = i->second.get();
 		}
 	}
 
