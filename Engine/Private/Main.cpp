@@ -1,7 +1,7 @@
-#include "Platform/IApplication.h"
-#include "Platform/SDLApplication.h"
+#include <IApplication.h>
+#include <IFilesystem.h>
 
-#include "Filesystem/IFilesystem.h"
+#include "Platform/SDLApplication.h"
 #include "Filesystem/Filesystem.h"
 
 #include <GL/glew.h>

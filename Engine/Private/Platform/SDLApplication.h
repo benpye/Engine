@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IApplication.h"
+#include <IApplication.h>
 #include <SDL.h>
 
 class SDLApplication : public IApplication
