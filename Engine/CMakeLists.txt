@@ -28,6 +28,9 @@ add_executable(Engine
 	Public/ITexture.h
 	${PUBLIC_INCLUDE}/miniz.c
 	${PUBLIC_INCLUDE}/miniz.h
+	${PUBLIC_INCLUDE}/stb_image.c
+	${PUBLIC_INCLUDE}/stb_image.h
+	${PUBLIC_INCLUDE}/GLBase.h
 )
 
 source_group(Public REGULAR_EXPRESSION Public/.*)

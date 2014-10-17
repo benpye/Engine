@@ -1,10 +1,17 @@
 #include <IApplication.h>
 #include <IFilesystem.h>
+#include <ITexture.h>
+#include <IRenderer.h>
 
 #include "Platform/SDLApplication.h"
 #include "Filesystem/Filesystem.h"
 
-#include <GL/glew.h>
+#include "Rendering/GL/GLRenderer.h"
+#include "Rendering/GL/GLTexture.h"
+
+#include <GLBase.h>
+
+#include <stb_image.h>
 
 int main(int argc, char** argv)
 {
@@ -22,27 +29,18 @@ int main(int argc, char** argv)
 	fs->SetWritePath(Filesystem::GetApplicationDirectory());
 	fs->AddSearchPath(fs->RelativeToFullPath("Test.zip"));
 
-	auto testlist = fs->FileFind("*");
-	FileExists exists = FileExists::None;
-	exists = fs->Exists("glew-1.11.0/src/glew.c");
-	fs->Remove("Test2.txt");
-	FileHandle f = fs->Open("test.txt", FileOpen::Write);
-	char* test = "Hello world!\n";
-	fs->Write(f, test, strlen(test));
-	unsigned int sz = fs->Size(f);
+	FileHandle f = fs->Open("Test.png");
+	int flen = fs->Size(f);
+	unsigned char *buf = new unsigned char[flen];
+	fs->Read(f, buf, flen);
 	fs->Close(f);
 
-	auto t = fs->Open("glew-1.11.0/README.txt");
-	fs->Seek(t, 4, FileSeek::Head);
-	fs->Seek(t, -2, FileSeek::Current);
-	char *buf = new char[fs->Size(t)];
-	fs->Read(t, buf, fs->Size(t));
+	int w, h, comp;
+	unsigned char *image = stbi_load_from_memory(buf, flen, &w, &h, &comp, STBI_rgb_alpha);
 
-	bool r = fs->CreateDirectoryHierarchy("Test/Dir/Structure");
-
-	auto e2 = fs->Exists("TestDirectory");
-	auto e3 = fs->Exists("glew-1.11.0");
-	auto e4 = fs->Exists("SDL2.dll");
+	GLRenderer *r = new GLRenderer();
+	auto t = r->CreateTexture();
+	t->Init(w, h, TextureFormat::RGBA8, image);
 
 	glewExperimental = true;
 	glewInit();
